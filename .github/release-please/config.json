@@ -2,6 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/v16.12.0/schemas/config.json",
   "release-type": "node",
   "include-component-in-tag": false,
+  "bootstrap-sha": "6cf7adb7e492c4cc06db157185fc469a8d48446b",
   "changelog-sections": [
     { "type": "feat", "section": "🌟 Features", "hidden": false },
     { "type": "fix", "section": "🩹 Fixes", "hidden": false },
