@@ -1,7 +1,8 @@
-# Disallow calling `cb()` inside of a `then()` (use [util.callbackify][] instead) (`promise/no-callback-in-promise`)
+# promise/no-callback-in-promise
 
-⚠️ This rule _warns_ in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Disallow calling `cb()` inside of a `then()` (use [util.callbackify][] instead).
+
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -14,14 +15,14 @@ Take the following example:
 
 ```js
 function callback(err, data) {
-  console.log('Callback got called with:', err, data)
-  throw new Error('My error')
+  console.log("Callback got called with:", err, data);
+  throw new Error("My error");
 }
 
 // note: passing `err.message` for demo purposes, normally you would pass `err`
 Promise.resolve()
-  .then(() => callback(null, 'data'))
-  .catch((err) => callback(err.message, null))
+  .then(() => callback(null, "data"))
+  .catch((err) => callback(err.message, null));
 ```
 
 If you run this example, your output will look like the following:
@@ -49,13 +50,13 @@ function such as:
 ```js
 // node.js
 Promise.resolve()
-  .then(() => setImmediate(() => callback(null, 'data')))
-  .catch((err) => setImmediate(() => callback(err.message, null)))
+  .then(() => setImmediate(() => callback(null, "data")))
+  .catch((err) => setImmediate(() => callback(err.message, null)));
 
 // node.js and browsers
 Promise.resolve()
-  .then(() => setTimeout(() => callback(null, 'data'), 0))
-  .catch((err) => setTimeout(() => callback(err.message, null), 0))
+  .then(() => setTimeout(() => callback(null, "data"), 0))
+  .catch((err) => setTimeout(() => callback(err.message, null), 0));
 ```
 
 Your output will now look like the following:
@@ -68,18 +69,12 @@ Finally, if your callbacks have a Node.js signature (i.e.
 `callback(err, data)`), consider using [util.promisify] for promisifying your
 callback code instead of combining the approaches.
 
-[util.promisify]:
-  https://nodejs.org/dist/latest/docs/api/util.html#utilpromisifyoriginal
-[promise.prototype.then()]:
-  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
-[promise.prototype.catch()]:
-  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch
-[setimmediate()]:
-  https://nodejs.org/docs/latest/api/timers.html#timers_setimmediate_callback_args
-[process.nexttick()]:
-  https://nodejs.org/docs/latest/api/process.html#process_process_nexttick_callback_args
-[settimeout()]:
-  https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout
+[util.promisify]: https://nodejs.org/dist/latest/docs/api/util.html#utilpromisifyoriginal
+[promise.prototype.then()]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
+[promise.prototype.catch()]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch
+[setimmediate()]: https://nodejs.org/docs/latest/api/timers.html#timers_setimmediate_callback_args
+[process.nexttick()]: https://nodejs.org/docs/latest/api/process.html#process_process_nexttick_callback_args
+[settimeout()]: https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout
 
 ## Options
 
@@ -87,5 +82,4 @@ callback code instead of combining the approaches.
 
 String list of callback function names to exempt.
 
-[util.callbackify]:
-  https://nodejs.org/docs/latest/api/util.html#utilcallbackifyoriginal
+[util.callbackify]: https://nodejs.org/docs/latest/api/util.html#utilcallbackifyoriginal

@@ -1,18 +1,22 @@
-'use strict'
+/**
+ * @typedef {import("estree").Node} Node
+ * @typedef {import("estree").SimpleCallExpression} CallExpression
+ */
 
 /**
- * @param {string} objectName
- * @param {Node} node
- * @returns {node is CallExpression}
+ * Checks whether a call expression belongs to a member chain rooted at the given object name.
+ *
+ * @param {string} objectName Object name to match.
+ * @param {Node} node Node to inspect.
+ * @returns {node is CallExpression} Whether the node is a member call rooted at the object name.
  */
 function isMemberCallWithObjectName(objectName, node) {
   return (
-    node.type === 'CallExpression' &&
-    node.callee.type === 'MemberExpression' &&
-    ((node.callee.object.type === 'Identifier' &&
-      node.callee.object.name === objectName) ||
+    node.type === "CallExpression" &&
+    node.callee.type === "MemberExpression" &&
+    ((node.callee.object.type === "Identifier" && node.callee.object.name === objectName) ||
       isMemberCallWithObjectName(objectName, node.callee.object))
-  )
+  );
 }
 
-module.exports = isMemberCallWithObjectName
+export default isMemberCallWithObjectName;

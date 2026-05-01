@@ -1,7 +1,8 @@
-# Disallow return statements in `finally()` (`promise/no-return-in-finally`)
+# promise/no-return-in-finally
 
-⚠️ This rule _warns_ in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Disallow return statements in `finally()`.
+
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -12,14 +13,14 @@ nothing would consume what's returned.
 
 ```js
 myPromise.finally(function (val) {
-  console.log('value:', val)
-})
+  console.log("value:", val);
+});
 ```
 
 #### Invalid
 
 ```js
 myPromise.finally(function (val) {
-  return val
-})
+  return val;
+});
 ```

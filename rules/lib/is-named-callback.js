@@ -1,14 +1,16 @@
-'use strict'
+const CALLBACK_NAMES = ["done", "cb", "callback", "next"];
 
-let callbacks = ['done', 'cb', 'callback', 'next']
+/**
+ * Check if a name is a known callback name.
+ *
+ * @param {string} potentialCallbackName - The name to check.
+ * @param {string[]} exceptions - Callback names to exclude from the check.
+ * @returns {boolean} Whether the name is an allowed callback name.
+ */
+export default function isNamedCallback(potentialCallbackName, exceptions) {
+  const allowedNames = CALLBACK_NAMES.filter((name) => {
+    return !exceptions.includes(name);
+  });
 
-module.exports = function isNamedCallback(potentialCallbackName, exceptions) {
-  for (let i = 0; i < exceptions.length; i++) {
-    callbacks = callbacks.filter((item) => {
-      return item !== exceptions[i]
-    })
-  }
-  return callbacks.some((trueCallbackName) => {
-    return potentialCallbackName === trueCallbackName
-  })
+  return allowedNames.includes(potentialCallbackName);
 }

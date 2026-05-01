@@ -1,54 +1,52 @@
 /**
  * Adapted from `eslint-plugin-unicorn`
+ *
  * @license MIT
  */
 
-'use strict'
-const {
-  isParenthesized,
-  isOpeningParenToken,
+import {
   isClosingParenToken,
-} = require('@eslint-community/eslint-utils')
+  isOpeningParenToken,
+  isParenthesized,
+} from "@eslint-community/eslint-utils";
 
-/*
-Get how many times the node is parenthesized.
-
-@param {Node} node - The node to be checked.
-@param {SourceCode} sourceCode - The source code object.
-@returns {number}
-*/
+/**
+ * Get how many times the node is parenthesized.
+ *
+ * @param {import("eslint").Rule.Node} node - The node to check.
+ * @param {import("eslint").SourceCode} sourceCode - The source code instance.
+ * @returns {number} The number of pairs of parentheses around the node.
+ */
 function getParenthesizedTimes(node, sourceCode) {
-  let times = 0
+  let times = 0;
 
   while (isParenthesized(times + 1, node, sourceCode)) {
-    times++
+    times++;
   }
 
-  return times
+  return times;
 }
 
-/*
-Get all parentheses tokens around the node.
-
-@param {Node} node - The node to be checked.
-@param {SourceCode} sourceCode - The source code object.
-@returns {Token[]}
-*/
+/**
+ * Get all parentheses tokens around the node.
+ *
+ * @param {import("eslint").Rule.Node} node - The node to check.
+ * @param {import("eslint").SourceCode} sourceCode - The source code instance.
+ * @returns {Array.<import("eslint").AST.Token>} Parentheses tokens around the node.
+ */
 function getParentheses(node, sourceCode) {
-  const count = getParenthesizedTimes(node, sourceCode)
+  const count = getParenthesizedTimes(node, sourceCode);
 
   if (count === 0) {
-    return []
+    return [];
   }
 
   return [
     ...sourceCode.getTokensBefore(node, { count, filter: isOpeningParenToken }),
     ...sourceCode.getTokensAfter(node, { count, filter: isClosingParenToken }),
-  ]
+  ];
 }
 
-module.exports = {
-  isParenthesized,
-  getParenthesizedTimes,
-  getParentheses,
-}
+export { getParenthesizedTimes, getParentheses };
+
+export { isParenthesized } from "@eslint-community/eslint-utils";

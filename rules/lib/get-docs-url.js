@@ -1,17 +1,14 @@
-'use strict'
-
-const REPO_URL = 'https://github.com/eslint-community/eslint-plugin-promise'
+const REPO_URL = "https://github.com/eslint-community/eslint-plugin-promise";
 
 /**
- * Generates the URL to documentation for the given rule name. It uses the
- * package version to build the link to a tagged version of the
- * documentation file.
+ * Generates the URL to documentation for the given rule name. It uses the package version to build the link to a tagged
+ * version of the documentation file.
  *
- * @param {string} ruleName - Name of the eslint rule
- * @returns {string} URL to the documentation for the given rule
+ * @param {string} ruleName - Name of the eslint rule.
+ * @returns {string} URL to the documentation for the given rule.
  */
 function getDocsUrl(ruleName) {
-  return `${REPO_URL}/blob/main/docs/rules/${ruleName}.md`
+  return `${REPO_URL}/blob/main/docs/rules/${ruleName}.md`;
 }
 
-module.exports = getDocsUrl
+export default getDocsUrl;

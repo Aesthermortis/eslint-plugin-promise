@@ -1,24 +1,25 @@
-# Disallow nested `then()` or `catch()` statements (`promise/no-nesting`)
+# promise/no-nesting
 
-⚠️ This rule _warns_ in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Disallow nested `then()` or `catch()` statements.
+
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
 #### Valid
 
 ```js
-myPromise.then(doSomething).then(doSomethingElse).catch(errors)
+myPromise.then(doSomething).then(doSomethingElse).catch(errors);
 ```
 
 #### Invalid
 
 ```js
-myPromise.then((val) => doSomething(val).then(doSomethingElse))
+myPromise.then((val) => doSomething(val).then(doSomethingElse));
 
-myPromise.then((val) => doSomething(val).catch(errors))
+myPromise.then((val) => doSomething(val).catch(errors));
 
-myPromise.catch((err) => doSomething(err).then(doSomethingElse))
+myPromise.catch((err) => doSomething(err).then(doSomethingElse));
 
-myPromise.catch((err) => doSomething(err).catch(errors))
+myPromise.catch((err) => doSomething(err).catch(errors));
 ```

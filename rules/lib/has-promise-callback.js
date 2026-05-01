@@ -4,34 +4,31 @@
  * with callback functions (like then() or catch())
  */
 
-'use strict'
+/**
+ * @typedef {import("estree").SimpleCallExpression} CallExpression
+ * @typedef {import("estree").MemberExpression} MemberExpression
+ * @typedef {import("estree").Identifier} Identifier
+ * @typedef {object} NameIsThenOrCatch
+ * @typedef {object} PropertyIsThenOrCatch
+ * @typedef {object} CalleeIsPromiseCallback
+ * @typedef {CallExpression & CalleeIsPromiseCallback} HasPromiseCallback
+ * @property {"then" | "catch"} name Promise callback method name.
+ * @property {Identifier & NameIsThenOrCatch} property Member property that names the callback method.
+ * @property {MemberExpression & PropertyIsThenOrCatch} callee Member expression used as the call callee.
+ */
 
 /**
- * @typedef {import('estree').SimpleCallExpression} CallExpression
- * @typedef {import('estree').MemberExpression} MemberExpression
- * @typedef {import('estree').Identifier} Identifier
+ * Checks whether a node is a `.then()` or `.catch()` call expression.
  *
- * @typedef {object} NameIsThenOrCatch
- * @property {'then' | 'catch'} name
- *
- * @typedef {object} PropertyIsThenOrCatch
- * @property {Identifier & NameIsThenOrCatch} property
- *
- * @typedef {object} CalleeIsPromiseCallback
- * @property {MemberExpression & PropertyIsThenOrCatch} callee
- *
- * @typedef {CallExpression & CalleeIsPromiseCallback} HasPromiseCallback
- */
-/**
- * @param {import('estree').Node} node
- * @returns {node is HasPromiseCallback}
+ * @param {import("estree").Node} node Node to inspect.
+ * @returns {node is HasPromiseCallback} Whether the node is a promise callback call.
  */
 function hasPromiseCallback(node) {
   // istanbul ignore if -- only being called within `CallExpression`
-  if (node.type !== 'CallExpression') return
-  if (node.callee.type !== 'MemberExpression') return
-  const propertyName = node.callee.property.name
-  return propertyName === 'then' || propertyName === 'catch'
+  if (node.type !== "CallExpression") return false;
+  if (node.callee.type !== "MemberExpression") return false;
+  const propertyName = node.callee.property.name;
+  return propertyName === "then" || propertyName === "catch";
 }
 
-module.exports = hasPromiseCallback
+export default hasPromiseCallback;

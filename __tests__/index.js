@@ -1,13 +1,14 @@
-'use strict'
+import plugin, { configs } from "../index.js";
 
-test('can require index file', () => {
-  expect(require('../index')).toBeInstanceOf(Object)
-})
+test("can import index file", () => {
+  expect(plugin).toBeInstanceOf(Object);
+});
 
-test('rule set', () => {
-  const plugin = require('../index')
-  expect(plugin.configs.recommended.rules).toEqual(
-    plugin.configs['flat/recommended'].rules,
-  )
-  expect(plugin.configs['flat/recommended'].plugins.promise).toBe(plugin)
-})
+test("rule set", () => {
+  expect(configs.recommended.name).toBe("promise/recommended");
+  expect(configs.recommended.plugins.promise).toBe(plugin);
+  expect(configs.recommended.rules).toEqual(
+    expect.objectContaining({ "promise/always-return": "error" }),
+  );
+  expect(configs["flat/recommended"]).toBeUndefined();
+});

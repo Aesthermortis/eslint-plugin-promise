@@ -3,61 +3,62 @@
  * Avoid nesting your promises.
  */
 
-'use strict'
+import getDocsUrl from "./lib/get-docs-url.js";
+import hasPromiseCallback from "./lib/has-promise-callback.js";
+import isInsidePromise from "./lib/is-inside-promise.js";
 
-const { getScope } = require('./lib/eslint-compat')
-const getDocsUrl = require('./lib/get-docs-url')
-const hasPromiseCallback = require('./lib/has-promise-callback')
-const isInsidePromise = require('./lib/is-inside-promise')
+/**
+ * Iterates references owned by variables defined in a scope.
+ *
+ * @param {import("eslint").Scope.Scope} scope - Scope whose variables should be inspected.
+ * @returns {Iterable<import("eslint").Scope.Reference>} References defined by variables in the scope.
+ * @yields {import("eslint").Scope.Reference} Reference defined by a variable in the scope.
+ */
+function* iterateDefinedReferences(scope) {
+  for (const variable of scope.variables) {
+    for (const reference of variable.references) {
+      yield reference;
+    }
+  }
+}
 
-module.exports = {
+export default {
   meta: {
-    type: 'suggestion',
+    type: "suggestion",
     docs: {
-      description: 'Disallow nested `then()` or `catch()` statements.',
-      url: getDocsUrl('no-nesting'),
+      description: "Disallow nested `then()` or `catch()` statements.",
+      url: getDocsUrl("no-nesting"),
     },
     schema: [],
     messages: {
-      avoidNesting: 'Avoid nesting promises.',
+      avoidNesting: "Avoid nesting promises.",
     },
   },
   create(context) {
     /**
      * Array of callback function scopes.
      * Scopes are in order closest to the current node.
-     * @type {import('eslint').Scope.Scope[]}
+     *
+     * @type {import("eslint").Scope.Scope[]}
      */
-    const callbackScopes = []
-
-    /**
-     * @param {import('eslint').Scope.Scope} scope
-     * @returns {Iterable<import('eslint').Scope.Reference>}
-     */
-    function* iterateDefinedReferences(scope) {
-      for (const variable of scope.variables) {
-        for (const reference of variable.references) {
-          yield reference
-        }
-      }
-    }
+    const callbackScopes = [];
 
     return {
-      ':function'(node) {
+      ":function"(node) {
         if (isInsidePromise(node)) {
-          callbackScopes.unshift(getScope(context, node))
+          callbackScopes.unshift(context.sourceCode.getScope(node));
         }
       },
-      ':function:exit'(node) {
+      ":function:exit"(node) {
         if (isInsidePromise(node)) {
-          callbackScopes.shift()
+          callbackScopes.shift();
         }
       },
       CallExpression(node) {
-        if (!hasPromiseCallback(node)) return
-        if (!callbackScopes.length) {
+        if (!hasPromiseCallback(node)) return;
+        if (callbackScopes.length === 0) {
           // The node is not in the callback function.
-          return
+          return;
         }
 
         // Checks if the argument callback uses variables defined in the closest callback function scope.
@@ -97,10 +98,8 @@ module.exports = {
         // ```
         // This is why we only check the closest callback function scope.
         //
-        const closestCallbackScope = callbackScopes[0]
-        for (const reference of iterateDefinedReferences(
-          closestCallbackScope,
-        )) {
+        const closestCallbackScope = callbackScopes[0];
+        for (const reference of iterateDefinedReferences(closestCallbackScope)) {
           if (
             node.arguments.some(
               (arg) =>
@@ -109,15 +108,15 @@ module.exports = {
             )
           ) {
             // Argument callbacks refer to variables defined in the callback function.
-            return
+            return;
           }
         }
 
         context.report({
           node: node.callee.property,
-          messageId: 'avoidNesting',
-        })
+          messageId: "avoidNesting",
+        });
       },
-    }
+    };
   },
-}
+};

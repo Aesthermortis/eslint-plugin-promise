@@ -1,7 +1,8 @@
-# Require returning inside each `then()` to create readable and reusable Promise chains (`promise/always-return`)
+# promise/always-return
 
-💼 This rule is enabled in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Require returning inside each `then()` to create readable and reusable Promise chains.
+
+💼 This rule is enabled in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -15,34 +16,34 @@ as `return Promise.reject()`.
 #### Valid
 
 ```js
-myPromise.then((val) => val * 2)
+myPromise.then((val) => val * 2);
 myPromise.then(function (val) {
-  return val * 2
-})
-myPromise.then(doSomething) // could be either
+  return val * 2;
+});
+myPromise.then(doSomething); // could be either
 myPromise.then((b) => {
   if (b) {
-    return 'yes'
+    return "yes";
   } else {
-    return 'no'
+    return "no";
   }
-})
+});
 ```
 
 #### Invalid
 
 ```js
-myPromise.then(function (val) {})
+myPromise.then(function (val) {});
 myPromise.then(() => {
-  doSomething()
-})
+  doSomething();
+});
 myPromise.then((b) => {
   if (b) {
-    return 'yes'
+    return "yes";
   } else {
-    forgotToReturn()
+    forgotToReturn();
   }
-})
+});
 ```
 
 #### Options
@@ -56,40 +57,40 @@ a `return`. Default is `false`.
 ```js
 // OK
 promise.then((x) => {
-  console.log(x)
-})
+  console.log(x);
+});
 // OK
 void promise.then((x) => {
-  console.log(x)
-})
+  console.log(x);
+});
 // OK
 await promise.then((x) => {
-  console.log(x)
-})
+  console.log(x);
+});
 
 promise
   // NG
   .then((x) => {
-    console.log(x)
+    console.log(x);
   })
   // OK
   .then((x) => {
-    console.log(x)
-  })
+    console.log(x);
+  });
 
 // NG
 const v = promise.then((x) => {
-  console.log(x)
-})
+  console.log(x);
+});
 // NG
 const v = await promise.then((x) => {
-  console.log(x)
-})
+  console.log(x);
+});
 function foo() {
   // NG
   return promise.then((x) => {
-    console.log(x)
-  })
+    console.log(x);
+  });
 }
 ```
 
@@ -105,30 +106,30 @@ chain does not warn if it does an assignment to a global variable. Default is
 
 // OK
 promise.then((x) => {
-  globalThis = x
-})
+  globalThis = x;
+});
 
 promise.then((x) => {
-  globalThis.x = x
-})
+  globalThis.x = x;
+});
 
 // OK
 promise.then((x) => {
-  globalThis.x.y = x
-})
+  globalThis.x.y = x;
+});
 
 // NG
 promise.then((x) => {
-  anyOtherVariable = x
-})
+  anyOtherVariable = x;
+});
 
 // NG
 promise.then((x) => {
-  anyOtherVariable.x = x
-})
+  anyOtherVariable.x = x;
+});
 
 // NG
 promise.then((x) => {
-  x()
-})
+  x();
+});
 ```

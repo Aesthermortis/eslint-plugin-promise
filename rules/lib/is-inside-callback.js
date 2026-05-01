@@ -1,24 +1,25 @@
-'use strict'
-
-const isInsidePromise = require('./is-inside-promise')
+import isInsidePromise from "./is-inside-promise.js";
 
 /**
- * @param {import('eslint').Rule.Node} node
- * @param {boolean} [exemptDeclarations]
+ * Checks whether a node is a callback function that receives an error argument.
+ *
+ * @param {import("eslint").Rule.Node} node - Node to inspect.
+ * @param {boolean} [exemptDeclarations] - Whether function declarations are excluded.
+ * @returns {boolean | undefined} Whether the node is inside a callback, or `undefined` when promises are allowed.
  */
 function isInsideCallback(node, exemptDeclarations) {
   const isFunction =
-    node.type === 'FunctionExpression' ||
-    node.type === 'ArrowFunctionExpression' ||
-    (!exemptDeclarations && node.type === 'FunctionDeclaration') // this may be controversial
+    node.type === "FunctionExpression" ||
+    node.type === "ArrowFunctionExpression" ||
+    (!exemptDeclarations && node.type === "FunctionDeclaration"); // this may be controversial
 
   // it's totally fine to use promises inside promises
-  if (isInsidePromise(node)) return
+  if (isInsidePromise(node)) return;
 
-  const name = node.params && node.params[0] && node.params[0].name
-  const firstArgIsError = name === 'err' || name === 'error'
-  const isInACallback = isFunction && firstArgIsError
-  return isInACallback
+  const name = node.params && node.params[0] && node.params[0].name;
+  const firstArgIsError = name === "err" || name === "error";
+  const isInACallback = isFunction && firstArgIsError;
+  return isInACallback;
 }
 
-module.exports = isInsideCallback
+export default isInsideCallback;

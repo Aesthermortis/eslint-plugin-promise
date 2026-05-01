@@ -1,4 +1,6 @@
-# Prefer `async`/`await` to the callback pattern (`promise/prefer-await-to-callbacks`)
+# promise/prefer-await-to-callbacks
+
+📝 Prefer `async`/`await` to the callback pattern.
 
 <!-- end auto-generated rule header -->
 
@@ -12,9 +14,9 @@ callback pattern.
 Examples of **incorrect** code for this rule:
 
 ```js
-cb()
-callback()
-doSomething(arg, (err) => {})
+cb();
+callback();
+doSomething(arg, (err) => {});
 function doSomethingElse(cb) {}
 ```
 

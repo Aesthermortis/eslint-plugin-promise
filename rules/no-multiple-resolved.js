@@ -1,501 +1,737 @@
 /**
  * Rule: no-multiple-resolved
- * Disallow creating new promises with paths that resolve multiple times
+ * Disallow creating new promises with paths that resolve multiple times.
  */
 
-'use strict'
-
-const { getScope } = require('./lib/eslint-compat')
-const getDocsUrl = require('./lib/get-docs-url')
-const {
-  isPromiseConstructorWithInlineExecutor,
-} = require('./lib/is-promise-constructor')
+import getDocsUrl from "./lib/get-docs-url.js";
+import { isPromiseConstructorWithInlineExecutor } from "./lib/is-promise-constructor.js";
 
 /**
- * @typedef {import('estree').Node} Node
- * @typedef {import('estree').Expression} Expression
- * @typedef {import('estree').Identifier} Identifier
- * @typedef {import('estree').FunctionExpression} FunctionExpression
- * @typedef {import('estree').ArrowFunctionExpression} ArrowFunctionExpression
- * @typedef {import('estree').SimpleCallExpression} CallExpression
- * @typedef {import('estree').MemberExpression} MemberExpression
- * @typedef {import('estree').NewExpression} NewExpression
- * @typedef {import('estree').ImportExpression} ImportExpression
- * @typedef {import('estree').YieldExpression} YieldExpression
- * @typedef {import('eslint').Rule.CodePath} CodePath
- * @typedef {import('eslint').Rule.CodePathSegment} CodePathSegment
+ * @typedef {import("estree").Node} Node
+ * @typedef {import("estree").Identifier} Identifier
+ * @typedef {import("estree").FunctionExpression} FunctionExpression
+ * @typedef {import("estree").ArrowFunctionExpression} ArrowFunctionExpression
+ * @typedef {import("estree").SimpleCallExpression} CallExpression
+ * @typedef {import("estree").MemberExpression} MemberExpression
+ * @typedef {import("estree").NewExpression} NewExpression
+ * @typedef {import("estree").ImportExpression} ImportExpression
+ * @typedef {import("estree").YieldExpression} YieldExpression
+ * @typedef {import("eslint").Rule.CodePath} CodePath
+ * @typedef {import("eslint").Rule.CodePathSegment} CodePathSegment
+ * @typedef {import("eslint").Rule.RuleContext} RuleContext
+ * @typedef {import("eslint").Scope.Scope} Scope
  */
 
 /**
  * An expression that can throw an error.
- * see https://github.com/eslint/eslint/blob/e940be7a83d0caea15b64c1e1c2785a6540e2641/lib/linter/code-path-analysis/code-path-analyzer.js#L639-L643
- * @typedef {CallExpression | MemberExpression | NewExpression | ImportExpression | YieldExpression} ThrowableExpression
+ *
+ * @typedef {Node} ThrowableExpression
+ * @see https://github.com/eslint/eslint/blob/e940be7a83d0caea15b64c1e1c2785a6540e2641/lib/linter/code-path-analysis/code-path-analyzer.js#L639-L643
  */
 
 /**
- * Iterate all previous path segments.
- * @param {CodePathSegment} segment
- * @returns {Iterable<CodePathSegment[]>}
+ * A resolver call found earlier on the same code path.
+ *
+ * @typedef {object} AlreadyResolvedData
+ * @property {Identifier} resolved - The resolver identifier that was already called.
+ * @property {"certain" | "potential"} kind - Whether every path or only some paths already resolved.
+ */
+
+/**
+ * Returns the function scope for a function node.
+ *
+ * @param {RuleContext} context - ESLint rule context.
+ * @param {FunctionExpression | ArrowFunctionExpression} node - Function node whose scope should be read.
+ * @returns {Scope} Scope associated with the function node.
+ */
+function getFunctionScope(context, node) {
+  return context.sourceCode.scopeManager.acquire(node);
+}
+
+/**
+ * Iterate all previous path segment routes.
+ *
+ * @param {CodePathSegment} segment - Segment whose previous routes should be traversed.
+ * @returns {Iterable<CodePathSegment[]>} Previous routes ordered from nearest segment to route start.
+ * @yields {CodePathSegment[]} A previous segment route.
  */
 function* iterateAllPrevPathSegments(segment) {
-  yield* iterate(segment, [])
+  yield* iteratePrevPathSegments(segment, []);
+}
 
-  /**
-   * @param {CodePathSegment} segment
-   * @param {CodePathSegment[]} processed
-   */
-  function* iterate(segment, processed) {
-    if (processed.includes(segment)) {
-      return
+/**
+ * Iterate previous path segment routes while guarding against cycles.
+ *
+ * @param {CodePathSegment} segment - Segment whose previous routes should be traversed.
+ * @param {CodePathSegment[]} processed - Segments already visited on the current traversal.
+ * @returns {Iterable<CodePathSegment[]>} Previous routes ordered from nearest segment to route start.
+ * @yields {CodePathSegment[]} A previous segment route.
+ */
+function* iteratePrevPathSegments(segment, processed) {
+  if (processed.includes(segment)) {
+    return;
+  }
+  const nextProcessed = [segment, ...processed];
+
+  for (const prev of segment.prevSegments) {
+    if (prev.prevSegments.length === 0) {
+      yield [prev];
+      continue;
     }
-    const nextProcessed = [segment, ...processed]
-
-    for (const prev of segment.prevSegments) {
-      if (prev.prevSegments.length === 0) {
-        yield [prev]
-      } else {
-        for (const segments of iterate(prev, nextProcessed)) {
-          yield [prev, ...segments]
-        }
-      }
+    for (const segments of iteratePrevPathSegments(prev, nextProcessed)) {
+      yield [prev, ...segments];
     }
   }
 }
+
 /**
- * Iterate all next path segments.
- * @param {CodePathSegment} segment
- * @returns {Iterable<CodePathSegment[]>}
+ * Iterate all next path segment routes.
+ *
+ * @param {CodePathSegment} segment - Segment whose next routes should be traversed.
+ * @returns {Iterable<CodePathSegment[]>} Next routes ordered from nearest segment to route end.
+ * @yields {CodePathSegment[]} A next segment route.
  */
 function* iterateAllNextPathSegments(segment) {
-  yield* iterate(segment, [])
+  yield* iterateNextPathSegments(segment, []);
+}
 
-  /**
-   * @param {CodePathSegment} segment
-   * @param {CodePathSegment[]} processed
-   */
-  function* iterate(segment, processed) {
-    if (processed.includes(segment)) {
-      return
+/**
+ * Iterate next path segment routes while guarding against cycles.
+ *
+ * @param {CodePathSegment} segment - Segment whose next routes should be traversed.
+ * @param {CodePathSegment[]} processed - Segments already visited on the current traversal.
+ * @returns {Iterable<CodePathSegment[]>} Next routes ordered from nearest segment to route end.
+ * @yields {CodePathSegment[]} A next segment route.
+ */
+function* iterateNextPathSegments(segment, processed) {
+  if (processed.includes(segment)) {
+    return;
+  }
+  const nextProcessed = [segment, ...processed];
+
+  for (const next of segment.nextSegments) {
+    if (next.nextSegments.length === 0) {
+      yield [next];
+      continue;
     }
-    const nextProcessed = [segment, ...processed]
+    for (const segments of iterateNextPathSegments(next, nextProcessed)) {
+      yield [next, ...segments];
+    }
+  }
+}
 
-    for (const next of segment.nextSegments) {
-      if (next.nextSegments.length === 0) {
-        yield [next]
-      } else {
-        for (const segments of iterate(next, nextProcessed)) {
-          yield [next, ...segments]
-        }
+/**
+ * Finds segment intersections shared by all routes leading to a segment.
+ *
+ * @param {CodePathSegment} segment - Segment whose common previous route segments should be found.
+ * @returns {Set<CodePathSegment>} Segments shared by every previous route.
+ */
+function getCommonPreviousRouteSegments(segment) {
+  /** @type {Set<CodePathSegment>} */
+  const routeSegments = new Set();
+
+  for (const route of iterateAllPrevPathSegments(segment)) {
+    if (routeSegments.size === 0) {
+      for (const routeSegment of route) {
+        routeSegments.add(routeSegment);
+      }
+      continue;
+    }
+    for (const routeSegment of routeSegments) {
+      if (!route.includes(routeSegment)) {
+        routeSegments.delete(routeSegment);
       }
     }
   }
+
+  return routeSegments;
+}
+
+/**
+ * Checks whether all routes from a route segment reach a target segment.
+ *
+ * @param {CodePathSegment} routeSegment - Segment to start route traversal from.
+ * @param {CodePathSegment} targetSegment - Segment expected to appear in all forward routes.
+ * @returns {boolean} Whether every forward route reaches the target segment.
+ */
+function everyRouteReachesSegment(routeSegment, targetSegment) {
+  for (const segments of iterateAllNextPathSegments(routeSegment)) {
+    if (!segments.includes(targetSegment)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * Checks whether a throwable expression is inside a resolver call in a try block.
+ *
+ * @param {ThrowableExpression} expression - Throwable expression that may be inside a resolver call.
+ * @param {Set<CallExpression>} resolverCalls - Resolver calls collected from the promise executor.
+ * @param {Node} tryStatement - Try statement that owns the catch segment.
+ * @returns {boolean} Whether the expression is inside a resolver call in the try block.
+ */
+function isExpressionInsideResolverCall(expression, resolverCalls, tryStatement) {
+  for (const resolverCall of resolverCalls) {
+    if (
+      expression.range &&
+      resolverCall.range &&
+      tryStatement.range &&
+      tryStatement.range[0] <= resolverCall.range[0] &&
+      resolverCall.range[1] <= tryStatement.range[1] &&
+      resolverCall.range[0] <= expression.range[0] &&
+      expression.range[1] <= resolverCall.range[1]
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
  * Finds the same route path from the given path following previous path segments.
- * @param {CodePathSegment} segment
- * @returns {CodePathSegment | null}
+ *
+ * @param {CodePathSegment} segment - Segment whose same-route predecessor should be found.
+ * @returns {CodePathSegment | null} The same-route segment when one exists.
  */
 function findSameRoutePathSegment(segment) {
-  /** @type {Set<CodePathSegment>} */
-  const routeSegments = new Set()
-  for (const route of iterateAllPrevPathSegments(segment)) {
-    if (routeSegments.size === 0) {
-      // First
-      for (const seg of route) {
-        routeSegments.add(seg)
-      }
-      continue
-    }
-    for (const seg of routeSegments) {
-      if (!route.includes(seg)) {
-        routeSegments.delete(seg)
-      }
+  for (const routeSegment of getCommonPreviousRouteSegments(segment)) {
+    if (everyRouteReachesSegment(routeSegment, segment)) {
+      return routeSegment;
     }
   }
-
-  for (const routeSegment of routeSegments) {
-    let hasUnreached = false
-    for (const segments of iterateAllNextPathSegments(routeSegment)) {
-      if (!segments.includes(segment)) {
-        // It has a route that does not reach the given path.
-        hasUnreached = true
-        break
-      }
-    }
-    if (!hasUnreached) {
-      return routeSegment
-    }
-  }
-  return null
+  return null;
 }
 
+/**
+ * Tracks resolver calls for one ESLint code path.
+ */
 class CodePathInfo {
-  /**
-   * @param {CodePath} path
-   */
+  /** @param {CodePath} path - ESLint code path represented by this instance. */
   constructor(path) {
-    this.path = path
+    this.path = path;
     /** @type {Map<CodePathSegment, CodePathSegmentInfo>} */
-    this.segmentInfos = new Map()
-    this.resolvedCount = 0
+    this.segmentInfos = new Map();
+    this.resolvedCount = 0;
     /** @type {Set<CodePathSegment>} */
-    this.currentSegments = new Set()
+    this.currentSegments = new Set();
   }
 
-  /** @param {CodePathSegment} segment */
-  onSegmentEnter(segment) {
-    this.currentSegments.add(segment)
-  }
-
-  /** @param {CodePathSegment} segment */
-  onSegmentExit(segment) {
-    this.currentSegments.delete(segment)
-  }
-
-  getCurrentSegmentInfos() {
-    return [...this.currentSegments].map((segment) => {
-      const info = this.segmentInfos.get(segment)
-      if (info) {
-        return info
-      }
-      const newInfo = new CodePathSegmentInfo(this, segment)
-      this.segmentInfos.set(segment, newInfo)
-      return newInfo
-    })
-  }
   /**
-   * @typedef {object} AlreadyResolvedData
-   * @property {Identifier} resolved
-   * @property {'certain' | 'potential'} kind
+   * Marks a code path segment as currently active.
+   *
+   * @param {CodePathSegment} segment - Segment that is being entered.
+   * @returns {void}
    */
+  onSegmentEnter(segment) {
+    this.currentSegments.add(segment);
+  }
+
+  /**
+   * Marks a code path segment as no longer active.
+   *
+   * @param {CodePathSegment} segment - Segment that is being exited.
+   * @returns {void}
+   */
+  onSegmentExit(segment) {
+    this.currentSegments.delete(segment);
+  }
+
+  /**
+   * Gets tracking data for all active code path segments.
+   *
+   * @returns {CodePathSegmentInfo[]} Tracking data for current segments.
+   */
+  getCurrentSegmentInfos() {
+    return [...this.currentSegments].map((segment) => this._getOrCreateSegmentInfo(segment));
+  }
 
   /**
    * Check all paths and return paths resolved multiple times.
-   * @param {PromiseCodePathContext} promiseCodePathContext
-   * @returns {Iterable<AlreadyResolvedData & { node: Identifier }>}
+   *
+   * @param {PromiseCodePathContext} promiseCodePathContext - Promise-specific code path state.
+   * @returns {Iterable<AlreadyResolvedData & { node: Identifier }>} Report data for duplicate resolver calls.
+   * @yields {AlreadyResolvedData & { node: Identifier }} A duplicate resolver report.
    */
   *iterateReports(promiseCodePathContext) {
-    const targets = [...this.segmentInfos.values()].filter(
-      (info) => info.resolved,
-    )
+    const targets = [...this.segmentInfos.values()].filter((info) => info.resolved);
     for (const segmentInfo of targets) {
-      const result = this._getAlreadyResolvedData(
-        segmentInfo.segment,
-        promiseCodePathContext,
-      )
+      const result = this._getAlreadyResolvedData(segmentInfo.segment, promiseCodePathContext);
       if (result) {
         yield {
           node: segmentInfo.resolved,
           resolved: result.resolved,
           kind: result.kind,
-        }
+        };
       }
     }
   }
+
   /**
-   * Compute the previously resolved path.
-   * @param {CodePathSegment} segment
-   * @param {PromiseCodePathContext} promiseCodePathContext
-   * @returns {AlreadyResolvedData | null}
+   * Gets already processed data for previous segments.
+   *
+   * @param {CodePathSegment} segment - Segment whose previous segments should be read.
+   * @param {PromiseCodePathContext} promiseCodePathContext - Promise-specific code path state.
+   * @returns {CodePathSegmentInfo[]} Processed previous segment data.
    */
-  _getAlreadyResolvedData(segment, promiseCodePathContext) {
-    const prevSegments = segment.prevSegments.filter(
-      (prev) => !promiseCodePathContext.isResolvedTryBlockCodePathSegment(prev),
-    )
-    if (prevSegments.length === 0) {
-      return null
-    }
-    const prevSegmentInfos = prevSegments.map((prev) =>
-      this._getProcessedSegmentInfo(prev, promiseCodePathContext),
-    )
-    if (prevSegmentInfos.every((info) => info.resolved)) {
-      // If the previous paths are all resolved, the next path is also resolved.
+  _getPreviousSegmentInfos(segment, promiseCodePathContext) {
+    return segment.prevSegments
+      .filter((prev) => !promiseCodePathContext.isResolvedTryBlockCodePathSegment(prev))
+      .map((prev) => this._getProcessedSegmentInfo(prev, promiseCodePathContext));
+  }
+
+  /**
+   * Computes a certain already-resolved result from previous segment data.
+   *
+   * @param {CodePathSegmentInfo[]} prevSegmentInfos - Previous segment tracking data.
+   * @returns {AlreadyResolvedData | null} Certain resolved data, if all previous paths resolved.
+   */
+  _getCertainResolvedData(prevSegmentInfos) {
+    if (prevSegmentInfos.length > 0 && prevSegmentInfos.every((info) => info.resolved)) {
       return {
         resolved: prevSegmentInfos[0].resolved,
-        kind: 'certain',
-      }
+        kind: "certain",
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Checks whether a potentially resolved segment flows into the current resolver.
+   *
+   * @param {CodePathSegmentInfo} prevSegmentInfo - Previous segment tracking data.
+   * @param {CodePathSegment} segment - Segment being evaluated.
+   * @returns {boolean} Whether the previous potential resolver reaches the segment.
+   */
+  _isPotentialResolutionReachable(prevSegmentInfo, segment) {
+    if (prevSegmentInfo.segment.nextSegments.length === 1) {
+      return true;
     }
 
+    const segmentInfo = this.segmentInfos.get(segment);
+    if (!segmentInfo?.resolved) {
+      return false;
+    }
+
+    return prevSegmentInfo.segment.nextSegments.every((next) => {
+      const nextSegmentInfo = this.segmentInfos.get(next);
+      return nextSegmentInfo?.resolved === segmentInfo.resolved;
+    });
+  }
+
+  /**
+   * Computes a potential already-resolved result from previous segment data.
+   *
+   * @param {CodePathSegmentInfo[]} prevSegmentInfos - Previous segment tracking data.
+   * @param {CodePathSegment} segment - Segment being evaluated.
+   * @returns {AlreadyResolvedData | null} Potential resolved data, if one previous path resolved.
+   */
+  _getPotentialResolvedData(prevSegmentInfos, segment) {
     for (const prevSegmentInfo of prevSegmentInfos) {
       if (prevSegmentInfo.resolved) {
-        // If the previous path is partially resolved,
-        // then the next path is potentially resolved.
         return {
           resolved: prevSegmentInfo.resolved,
-          kind: 'potential',
-        }
+          kind: "potential",
+        };
       }
-      if (prevSegmentInfo.potentiallyResolved) {
-        let potential = false
-        if (prevSegmentInfo.segment.nextSegments.length === 1) {
-          // If the previous path is potentially resolved and there is one next path,
-          // then the next path is potentially resolved.
-          potential = true
-        } else {
-          // This is necessary, for example, if `resolve()` in the finally section.
-          const segmentInfo = this.segmentInfos.get(segment)
-          if (segmentInfo && segmentInfo.resolved) {
-            if (
-              prevSegmentInfo.segment.nextSegments.every((next) => {
-                const nextSegmentInfo = this.segmentInfos.get(next)
-                return (
-                  nextSegmentInfo &&
-                  nextSegmentInfo.resolved === segmentInfo.resolved
-                )
-              })
-            ) {
-              // If the previous path is potentially resolved and
-              // the next paths all point to the same resolved node,
-              // then the next path is potentially resolved.
-              potential = true
-            }
-          }
-        }
-
-        if (potential) {
-          return {
-            resolved: prevSegmentInfo.potentiallyResolved,
-            kind: 'potential',
-          }
-        }
-      }
-    }
-
-    const sameRoute = findSameRoutePathSegment(segment)
-    if (sameRoute) {
-      const sameRouteSegmentInfo = this._getProcessedSegmentInfo(sameRoute)
-      if (sameRouteSegmentInfo.potentiallyResolved) {
+      if (
+        prevSegmentInfo.potentiallyResolved &&
+        this._isPotentialResolutionReachable(prevSegmentInfo, segment)
+      ) {
         return {
-          resolved: sameRouteSegmentInfo.potentiallyResolved,
-          kind: 'potential',
-        }
+          resolved: prevSegmentInfo.potentiallyResolved,
+          kind: "potential",
+        };
       }
     }
-    return null
+    return null;
   }
+
   /**
-   * @param {CodePathSegment} segment
-   * @param {PromiseCodePathContext} promiseCodePathContext
+   * Computes a potential already-resolved result from a same-route segment.
+   *
+   * @param {CodePathSegment} segment - Segment being evaluated.
+   * @param {PromiseCodePathContext} promiseCodePathContext - Promise-specific code path state.
+   * @returns {AlreadyResolvedData | null} Potential resolved data from a same-route segment.
+   */
+  _getSameRouteResolvedData(segment, promiseCodePathContext) {
+    const sameRoute = findSameRoutePathSegment(segment);
+    if (!sameRoute) {
+      return null;
+    }
+
+    const sameRouteSegmentInfo = this._getProcessedSegmentInfo(sameRoute, promiseCodePathContext);
+    if (!sameRouteSegmentInfo.potentiallyResolved) {
+      return null;
+    }
+
+    return {
+      resolved: sameRouteSegmentInfo.potentiallyResolved,
+      kind: "potential",
+    };
+  }
+
+  /**
+   * Compute the previously resolved path.
+   *
+   * @param {CodePathSegment} segment - Segment being evaluated.
+   * @param {PromiseCodePathContext} promiseCodePathContext - Promise-specific code path state.
+   * @returns {AlreadyResolvedData | null} Already-resolved data when a resolver reaches this segment.
+   */
+  _getAlreadyResolvedData(segment, promiseCodePathContext) {
+    const prevSegmentInfos = this._getPreviousSegmentInfos(segment, promiseCodePathContext);
+
+    return (
+      this._getCertainResolvedData(prevSegmentInfos) ??
+      this._getPotentialResolvedData(prevSegmentInfos, segment) ??
+      this._getSameRouteResolvedData(segment, promiseCodePathContext)
+    );
+  }
+
+  /**
+   * Gets processed tracking data for a code path segment.
+   *
+   * @param {CodePathSegment} segment - Segment whose tracking data should be read.
+   * @param {PromiseCodePathContext} promiseCodePathContext - Promise-specific code path state.
+   * @returns {CodePathSegmentInfo} Tracking data for the segment.
    */
   _getProcessedSegmentInfo(segment, promiseCodePathContext) {
-    const segmentInfo = this.segmentInfos.get(segment)
+    const segmentInfo = this.segmentInfos.get(segment);
     if (segmentInfo) {
-      return segmentInfo
+      return segmentInfo;
     }
-    const newInfo = new CodePathSegmentInfo(this, segment)
-    this.segmentInfos.set(segment, newInfo)
+    const newInfo = this._getOrCreateSegmentInfo(segment);
 
-    const alreadyResolvedData = this._getAlreadyResolvedData(
-      segment,
-      promiseCodePathContext,
-    )
-    if (alreadyResolvedData) {
-      if (alreadyResolvedData.kind === 'certain') {
-        newInfo.resolved = alreadyResolvedData.resolved
-      } else {
-        newInfo.potentiallyResolved = alreadyResolvedData.resolved
-      }
+    const alreadyResolvedData = this._getAlreadyResolvedData(segment, promiseCodePathContext);
+    if (alreadyResolvedData?.kind === "certain") {
+      newInfo.resolved = alreadyResolvedData.resolved;
+    } else if (alreadyResolvedData) {
+      newInfo.potentiallyResolved = alreadyResolvedData.resolved;
     }
-    return newInfo
+    return newInfo;
+  }
+
+  /**
+   * Gets existing tracking data or creates a new tracker for a segment.
+   *
+   * @param {CodePathSegment} segment - Segment whose tracking data should be read.
+   * @returns {CodePathSegmentInfo} Tracking data for the segment.
+   */
+  _getOrCreateSegmentInfo(segment) {
+    const segmentInfo = this.segmentInfos.get(segment);
+    if (segmentInfo) {
+      return segmentInfo;
+    }
+
+    const newInfo = new CodePathSegmentInfo(this, segment);
+    this.segmentInfos.set(segment, newInfo);
+    return newInfo;
   }
 }
 
+/**
+ * Resolver data for a single ESLint code path segment.
+ */
 class CodePathSegmentInfo {
   /**
-   * @param {CodePathInfo} pathInfo
-   * @param {CodePathSegment} segment
+   * @param {CodePathInfo} pathInfo - Code path info that owns this segment.
+   * @param {CodePathSegment} segment - Segment represented by this instance.
    */
   constructor(pathInfo, segment) {
-    this.pathInfo = pathInfo
-    this.segment = segment
+    this.pathInfo = pathInfo;
+    this.segment = segment;
     /** @type {Identifier | null} */
-    this._resolved = null
+    this._resolved = null;
     /** @type {Identifier | null} */
-    this.potentiallyResolved = null
+    this.potentiallyResolved = null;
   }
 
+  /**
+   * Resolver identifier certainly called on this segment.
+   *
+   * @returns {Identifier | null} Resolver identifier when this segment is resolved.
+   */
   get resolved() {
-    return this._resolved
+    return this._resolved;
   }
-  /** @type {Identifier} */
+
+  /**
+   * Stores the resolver identifier certainly called on this segment.
+   *
+   * @param {Identifier} identifier - Resolver identifier found on the segment.
+   */
   set resolved(identifier) {
-    this._resolved = identifier
-    this.pathInfo.resolvedCount++
+    this._resolved = identifier;
+    this.pathInfo.resolvedCount++;
   }
 }
 
+/**
+ * Promise-specific code path state.
+ */
 class PromiseCodePathContext {
   constructor() {
     /** @type {Set<string>} */
-    this.resolvedSegmentIds = new Set()
+    this.resolvedSegmentIds = new Set();
   }
-  /** @param {CodePathSegment} */
+
+  /**
+   * Marks a try-block segment that ended with a resolver call.
+   *
+   * @param {CodePathSegment} segment - Segment to mark.
+   * @returns {void}
+   */
   addResolvedTryBlockCodePathSegment(segment) {
-    this.resolvedSegmentIds.add(segment.id)
+    this.resolvedSegmentIds.add(segment.id);
   }
-  /** @param {CodePathSegment} */
+
+  /**
+   * Checks whether a segment belongs to a try block that ended with a resolver call.
+   *
+   * @param {CodePathSegment} segment - Segment to check.
+   * @returns {boolean} Whether the segment should be ignored as already handled by try/catch flow.
+   */
   isResolvedTryBlockCodePathSegment(segment) {
-    return this.resolvedSegmentIds.has(segment.id)
+    return this.resolvedSegmentIds.has(segment.id);
   }
 }
 
-module.exports = {
+export default {
   meta: {
-    type: 'problem',
+    type: "problem",
     docs: {
-      description:
-        'Disallow creating new promises with paths that resolve multiple times.',
-      url: getDocsUrl('no-multiple-resolved'),
+      description: "Disallow creating new promises with paths that resolve multiple times.",
+      url: getDocsUrl("no-multiple-resolved"),
     },
     messages: {
       alreadyResolved:
-        'Promise should not be resolved multiple times. Promise is already resolved on line {{line}}.',
+        "Promise should not be resolved multiple times. Promise is already resolved on line {{line}}.",
       potentiallyAlreadyResolved:
-        'Promise should not be resolved multiple times. Promise is potentially resolved on line {{line}}.',
+        "Promise should not be resolved multiple times. Promise is potentially resolved on line {{line}}.",
     },
     schema: [],
   },
-  /** @param {import('eslint').Rule.RuleContext} context */
+
+  /**
+   * Creates listeners for the rule.
+   *
+   * @param {RuleContext} context - ESLint rule context.
+   * @returns {import("eslint").Rule.RuleListener} Rule visitor callbacks.
+   */
   create(context) {
-    const reported = new Set()
-    const promiseCodePathContext = new PromiseCodePathContext()
+    const reported = new Set();
+    const promiseCodePathContext = new PromiseCodePathContext();
+
     /**
-     * @param {Identifier} node
-     * @param {Identifier} resolved
-     * @param {'certain' | 'potential'} kind
+     * Reports a duplicate resolver call once.
+     *
+     * @param {Identifier} node - Resolver identifier that resolves again.
+     * @param {Identifier} resolved - Previous resolver identifier.
+     * @param {"certain" | "potential"} kind - Whether the previous resolution is certain or potential.
+     * @returns {void}
      */
     function report(node, resolved, kind) {
       if (reported.has(node)) {
-        return
+        return;
       }
-      reported.add(node)
+      reported.add(node);
       context.report({
         node: node.parent,
-        messageId:
-          kind === 'certain' ? 'alreadyResolved' : 'potentiallyAlreadyResolved',
+        messageId: kind === "certain" ? "alreadyResolved" : "potentiallyAlreadyResolved",
         data: {
           line: resolved.loc.start.line,
         },
-      })
+      });
     }
+
     /**
-     * @param {CodePathInfo} codePathInfo
-     * @param {PromiseCodePathContext} promiseCodePathContext
+     * Verifies resolver calls recorded for a completed code path.
+     *
+     * @param {CodePathInfo} codePathInfo - Code path data to verify.
+     * @param {PromiseCodePathContext} promiseCodePathContext - Promise-specific code path state.
+     * @returns {void}
      */
     function verifyMultipleResolvedPath(codePathInfo, promiseCodePathContext) {
-      for (const { node, resolved, kind } of codePathInfo.iterateReports(
-        promiseCodePathContext,
-      )) {
-        report(node, resolved, kind)
+      for (const { node, resolved, kind } of codePathInfo.iterateReports(promiseCodePathContext)) {
+        report(node, resolved, kind);
+      }
+    }
+
+    /**
+     * Records a resolver call and reports already resolved paths.
+     *
+     * @param {Identifier} node - Resolver identifier used as a call callee.
+     * @param {CallExpression} callExpression - Resolver call expression.
+     * @returns {void}
+     */
+    function processResolverCall(node, callExpression) {
+      const codePathInfo = codePathInfoStack[0];
+      resolverCallsStack[0].add(callExpression);
+      for (const segmentInfo of codePathInfo.getCurrentSegmentInfos()) {
+        if (segmentInfo.resolved) {
+          report(node, segmentInfo.resolved, "certain");
+          continue;
+        }
+        segmentInfo.resolved = node;
       }
     }
 
     /** @type {CodePathInfo[]} */
-    const codePathInfoStack = []
+    const codePathInfoStack = [];
     /** @type {Set<Identifier>[]} */
-    const resolverReferencesStack = [new Set()]
+    const resolverReferencesStack = [new Set()];
+    /** @type {Set<CallExpression>[]} */
+    const resolverCallsStack = [new Set()];
     /** @type {ThrowableExpression | null} */
-    let lastThrowableExpression = null
+    let lastThrowableExpression = null;
     return {
-      /** @param {FunctionExpression | ArrowFunctionExpression} node */
-      'FunctionExpression, ArrowFunctionExpression'(node) {
+      /**
+       * Collects resolver references for promise executor functions.
+       *
+       * @param {FunctionExpression | ArrowFunctionExpression} node - Function node being entered.
+       * @returns {void}
+       */
+      "FunctionExpression, ArrowFunctionExpression"(node) {
         if (!isPromiseConstructorWithInlineExecutor(node.parent)) {
-          return
+          return;
         }
-        // Collect and stack `resolve` and `reject` references.
         /** @type {Set<Identifier>} */
-        const resolverReferences = new Set()
+        const resolverReferences = new Set();
         const resolvers = node.params.filter(
-          /** @returns {node is Identifier} */
-          (node) => node && node.type === 'Identifier',
-        )
+          /**
+           * Checks whether a function parameter is an identifier resolver.
+           *
+           * @param {Node} node - Function parameter node.
+           * @returns {node is Identifier} Whether the parameter is an identifier.
+           */
+          (node) => node && node.type === "Identifier",
+        );
+        const functionScope = getFunctionScope(context, node);
         for (const resolver of resolvers) {
-          const variable = getScope(context, node).set.get(resolver.name)
+          const variable = functionScope.set.get(resolver.name);
           // istanbul ignore next -- Usually always present.
-          if (!variable) continue
+          if (!variable) continue;
           for (const reference of variable.references) {
-            resolverReferences.add(reference.identifier)
+            resolverReferences.add(reference.identifier);
           }
         }
 
-        resolverReferencesStack.unshift(resolverReferences)
+        resolverReferencesStack.unshift(resolverReferences);
+        resolverCallsStack.unshift(new Set());
       },
-      /** @param {FunctionExpression | ArrowFunctionExpression} node */
-      'FunctionExpression, ArrowFunctionExpression:exit'(node) {
+
+      /**
+       * Pops resolver references for promise executor functions.
+       *
+       * @param {FunctionExpression | ArrowFunctionExpression} node - Function node being exited.
+       * @returns {void}
+       */
+      "FunctionExpression, ArrowFunctionExpression:exit"(node) {
         if (!isPromiseConstructorWithInlineExecutor(node.parent)) {
-          return
+          return;
         }
-        resolverReferencesStack.shift()
+        resolverReferencesStack.shift();
+        resolverCallsStack.shift();
       },
-      /** @param {CodePath} path */
+
+      /**
+       * Starts tracking an ESLint code path.
+       *
+       * @param {CodePath} path - Code path being entered.
+       * @returns {void}
+       */
       onCodePathStart(path) {
-        codePathInfoStack.unshift(new CodePathInfo(path))
+        codePathInfoStack.unshift(new CodePathInfo(path));
       },
+
+      /**
+       * Verifies and pops a completed ESLint code path.
+       *
+       * @returns {void}
+       */
       onCodePathEnd() {
-        const codePathInfo = codePathInfoStack.shift()
+        const codePathInfo = codePathInfoStack.shift();
         if (codePathInfo.resolvedCount > 1) {
-          verifyMultipleResolvedPath(codePathInfo, promiseCodePathContext)
+          verifyMultipleResolvedPath(codePathInfo, promiseCodePathContext);
         }
       },
-      /** @param {ThrowableExpression} node */
-      'CallExpression, MemberExpression, NewExpression, ImportExpression, YieldExpression:exit'(
+
+      /**
+       * Records the last expression that can throw.
+       *
+       * @param {ThrowableExpression} node - Throwable expression being exited.
+       * @returns {void}
+       */
+      "CallExpression, MemberExpression, NewExpression, ImportExpression, YieldExpression:exit"(
         node,
       ) {
-        lastThrowableExpression = node
+        lastThrowableExpression = node;
+        if (
+          node.type === "CallExpression" &&
+          node.callee.type === "Identifier" &&
+          resolverReferencesStack[0].has(node.callee)
+        ) {
+          processResolverCall(node.callee, node);
+        }
       },
-      /** @param {CodePathSegment} segment */
-      onCodePathSegmentStart(segment) {
-        codePathInfoStack[0].onSegmentEnter(segment)
-      },
-      /** @param {CodePathSegment} segment */
-      /* istanbul ignore next */ // It is not called in ESLint v7.
-      onUnreachableCodePathSegmentStart(segment) {
-        codePathInfoStack[0].onSegmentEnter(segment)
-      },
+
       /**
-       * @param {CodePathSegment} segment
-       * @param {Node} node
+       * Marks a code path segment as active.
+       *
+       * @param {CodePathSegment} segment - Segment being entered.
+       * @returns {void}
+       */
+      onCodePathSegmentStart(segment) {
+        codePathInfoStack[0].onSegmentEnter(segment);
+      },
+
+      /**
+       * Marks an unreachable code path segment as active.
+       *
+       * @param {CodePathSegment} segment - Segment being entered.
+       * @returns {void}
+       */
+      /* istanbul ignore next -- It is not called in ESLint v7. */
+      onUnreachableCodePathSegmentStart(segment) {
+        codePathInfoStack[0].onSegmentEnter(segment);
+      },
+
+      /**
+       * Marks try-block resolver segments and exits a code path segment.
+       *
+       * @param {CodePathSegment} segment - Segment being exited.
+       * @param {Node} node - AST node associated with the segment end.
+       * @returns {void}
        */
       onCodePathSegmentEnd(segment, node) {
         if (
-          node.type === 'CatchClause' &&
+          node.type === "CatchClause" &&
           lastThrowableExpression &&
-          lastThrowableExpression.type === 'CallExpression' &&
-          node.parent.type === 'TryStatement' &&
+          node.parent.type === "TryStatement" &&
           node.parent.range[0] <= lastThrowableExpression.range[0] &&
-          lastThrowableExpression.range[1] <= node.parent.range[1]
+          lastThrowableExpression.range[1] <= node.parent.range[1] &&
+          isExpressionInsideResolverCall(
+            lastThrowableExpression,
+            resolverCallsStack[0],
+            node.parent,
+          )
         ) {
-          const resolverReferences = resolverReferencesStack[0]
-          if (resolverReferences.has(lastThrowableExpression.callee)) {
-            // Mark a segment if the last expression in the try block is a call to resolve.
-            promiseCodePathContext.addResolvedTryBlockCodePathSegment(segment)
-          }
+          promiseCodePathContext.addResolvedTryBlockCodePathSegment(segment);
         }
-        codePathInfoStack[0].onSegmentExit(segment)
+        codePathInfoStack[0].onSegmentExit(segment);
       },
-      /** @param {CodePathSegment} segment */
-      /* istanbul ignore next */ // It is not called in ESLint v7.
+
+      /**
+       * Marks an unreachable code path segment as inactive.
+       *
+       * @param {CodePathSegment} segment - Segment being exited.
+       * @returns {void}
+       */
+      /* istanbul ignore next -- It is not called in ESLint v7. */
       onUnreachableCodePathSegmentEnd(segment) {
-        codePathInfoStack[0].onSegmentExit(segment)
+        codePathInfoStack[0].onSegmentExit(segment);
       },
-      /** @type {Identifier} */
-      'CallExpression > Identifier.callee'(node) {
-        const codePathInfo = codePathInfoStack[0]
-        const resolverReferences = resolverReferencesStack[0]
-        if (!resolverReferences.has(node)) {
-          return
-        }
-        for (const segmentInfo of codePathInfo.getCurrentSegmentInfos()) {
-          // If a resolving path is found, report if the path is already resolved.
-          // Store the information if it is not already resolved.
-          if (segmentInfo.resolved) {
-            report(node, segmentInfo.resolved, 'certain')
-            continue
-          }
-          segmentInfo.resolved = node
-        }
-      },
-    }
+    };
   },
-}
+};

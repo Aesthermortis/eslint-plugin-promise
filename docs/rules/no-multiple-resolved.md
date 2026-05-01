@@ -1,4 +1,6 @@
-# Disallow creating new promises with paths that resolve multiple times (`promise/no-multiple-resolved`)
+# promise/no-multiple-resolved
+
+📝 Disallow creating new promises with paths that resolve multiple times.
 
 <!-- end auto-generated rule header -->
 
@@ -11,12 +13,12 @@ Promise constructors.
 new Promise((resolve, reject) => {
   fn((error, value) => {
     if (error) {
-      reject(error)
+      reject(error);
     } else {
-      resolve(value)
+      resolve(value);
     }
-  })
-})
+  });
+});
 ```
 
 #### Invalid
@@ -25,10 +27,10 @@ new Promise((resolve, reject) => {
 new Promise((resolve, reject) => {
   fn((error, value) => {
     if (error) {
-      reject(error)
+      reject(error);
     }
 
-    resolve(value) // Both `reject` and `resolve` may be called.
-  })
-})
+    resolve(value); // Both `reject` and `resolve` may be called.
+  });
+});
 ```

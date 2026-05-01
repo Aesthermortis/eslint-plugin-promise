@@ -1,7 +1,8 @@
-# Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors (`promise/prefer-catch`)
+# promise/prefer-catch
 
-🔧 This rule is automatically fixable by the
-[`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
+📝 Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
+
+🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
 
 <!-- end auto-generated rule header -->
 
@@ -17,13 +18,13 @@ first argument, but it will only handle errors earlier in the Promise chain.
 Examples of **incorrect** code for this rule:
 
 ```js
-prom.then(fn1).then(fn2)
-prom.catch(handleErr).then(handle)
+prom.then(fn1).then(fn2);
+prom.catch(handleErr).then(handle);
 ```
 
 Examples of **incorrect** code for this rule:
 
 ```js
-hey.then(fn1, fn2)
-hey.then(null, fn2)
+hey.then(fn1, fn2);
+hey.then(null, fn2);
 ```

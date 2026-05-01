@@ -1,7 +1,8 @@
-# Require creating a `Promise` constructor before using it in an ES5 environment (`promise/no-native`)
+# promise/no-native
 
-🚫 This rule is _disabled_ in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Require creating a `Promise` constructor before using it in an ES5 environment.
+
+🚫 This rule is _disabled_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -12,12 +13,12 @@ existence of a native promise implementation. Helpful if you want to use
 #### Valid
 
 ```js
-const Promise = require('bluebird')
-const x = Promise.resolve('good')
+const Promise = require("bluebird");
+const x = Promise.resolve("good");
 ```
 
 #### Invalid
 
 ```js
-const x = Promise.resolve('bad')
+const x = Promise.resolve("bad");
 ```

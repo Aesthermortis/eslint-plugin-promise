@@ -1,4 +1,6 @@
-# Disallow use of non-standard Promise static methods (`promise/spec-only`)
+# promise/spec-only
+
+📝 Disallow use of non-standard Promise static methods.
 
 <!-- end auto-generated rule header -->
 
@@ -8,13 +10,13 @@ extensions. This rule reports any such method usage.
 ## Valid
 
 ```js
-const x = Promise.resolve('good')
+const x = Promise.resolve("good");
 ```
 
 ## Invalid
 
 ```js
-const x = Promise.done('bad')
+const x = Promise.done("bad");
 ```
 
 ## Options

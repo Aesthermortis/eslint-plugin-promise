@@ -1,7 +1,8 @@
-# Enforce the use of `catch()` on un-returned promises (`promise/catch-or-return`)
+# promise/catch-or-return
 
-💼 This rule is enabled in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Enforce the use of `catch()` on un-returned promises.
+
+💼 This rule is enabled in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -11,20 +12,20 @@ as well. Exceptions are made if you are returning that promise.
 #### Valid
 
 ```js
-myPromise.then(doSomething).catch(errors)
-myPromise.then(doSomething).then(doSomethingElse).catch(errors)
+myPromise.then(doSomething).catch(errors);
+myPromise.then(doSomething).then(doSomethingElse).catch(errors);
 function doSomethingElse() {
-  return myPromise.then(doSomething)
+  return myPromise.then(doSomething);
 }
 ```
 
 #### Invalid
 
 ```js
-myPromise.then(doSomething)
-myPromise.then(doSomething, catchErrors) // catch() may be a little better
+myPromise.then(doSomething);
+myPromise.then(doSomething, catchErrors); // catch() may be a little better
 function doSomethingElse() {
-  return myPromise.then(doSomething)
+  return myPromise.then(doSomething);
 }
 ```
 
@@ -43,16 +44,16 @@ arguments instead of `catch()` to handle promise rejections.
 Examples of **incorrect** code for the default `{ allowThen: false }` option:
 
 ```js
-myPromise.then(doSomething, handleErrors)
-myPromise.then(null, handleErrors)
+myPromise.then(doSomething, handleErrors);
+myPromise.then(null, handleErrors);
 ```
 
 Examples of **correct** code for the `{ allowThen: true }` option:
 
 ```js
-myPromise.then(doSomething, handleErrors)
-myPromise.then(null, handleErrors)
-myPromise.then(doSomething).catch(handleErrors)
+myPromise.then(doSomething, handleErrors);
+myPromise.then(null, handleErrors);
+myPromise.then(doSomething).catch(handleErrors);
 ```
 
 ##### `allowThenStrict`
@@ -66,21 +67,21 @@ Examples of **incorrect** code for the default `{ allowThenStrict: false }`
 option:
 
 ```js
-myPromise.then(doSomething, handleErrors)
-myPromise.then(null, handleErrors)
+myPromise.then(doSomething, handleErrors);
+myPromise.then(null, handleErrors);
 ```
 
 Examples of **correct** code for the `{ allowThenStrict: true }` option:
 
 ```js
-myPromise.then(null, handleErrors)
-myPromise.then(doSomething).catch(handleErrors)
+myPromise.then(null, handleErrors);
+myPromise.then(doSomething).catch(handleErrors);
 ```
 
 Examples of **incorrect** code for the `{ allowThenStrict: true }` option:
 
 ```js
-myPromise.then(doSomething, handleErrors)
+myPromise.then(doSomething, handleErrors);
 ```
 
 ##### `allowFinally`
@@ -104,17 +105,17 @@ This will allow any of
 ```js
 Promise.resolve(1)
   .then(() => {
-    throw new Error('oops')
+    throw new Error("oops");
   })
-  .catch(logerror)
+  .catch(logerror);
 Promise.resolve(1)
   .then(() => {
-    throw new Error('oops')
+    throw new Error("oops");
   })
-  .asCallback(cb)
+  .asCallback(cb);
 Promise.resolve(1)
   .then(() => {
-    throw new Error('oops')
+    throw new Error("oops");
   })
-  .finally(cleanUp)
+  .finally(cleanUp);
 ```

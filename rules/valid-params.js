@@ -1,94 +1,98 @@
-'use strict'
-
-const getDocsUrl = require('./lib/get-docs-url')
-const isPromise = require('./lib/is-promise')
-
-module.exports = {
+import getDocsUrl from "./lib/get-docs-url.js";
+import isPromise from "./lib/is-promise.js";
+export default {
   meta: {
-    type: 'problem',
+    type: "problem",
     docs: {
-      description:
-        'Enforces the proper number of arguments are passed to Promise functions.',
-      url: getDocsUrl('valid-params'),
+      description: "Enforces the proper number of arguments are passed to Promise functions.",
+      url: getDocsUrl("valid-params"),
     },
     schema: [
       {
-        type: 'object',
+        type: "object",
         properties: {
           exclude: {
-            type: 'array',
+            type: "array",
+            description: "Promise methods to skip when validating argument counts.",
             items: {
-              type: 'string',
+              type: "string",
             },
           },
         },
         additionalProperties: false,
       },
     ],
+    defaultOptions: [
+      {
+        exclude: [],
+      },
+    ],
     messages: {
       requireOneOptionalArgument:
-        'Promise.{{ name }}() requires 0 or 1 arguments, but received {{ numArgs }}',
-      requireOneArgument:
-        'Promise.{{ name }}() requires 1 argument, but received {{ numArgs }}',
+        "Promise.{{ name }}() requires 0 or 1 arguments, but received {{ numArgs }}",
+      requireOneArgument: "Promise.{{ name }}() requires 1 argument, but received {{ numArgs }}",
       requireTwoOptionalArguments:
-        'Promise.{{ name }}() requires 1 or 2 arguments, but received {{ numArgs }}',
+        "Promise.{{ name }}() requires 1 or 2 arguments, but received {{ numArgs }}",
     },
   },
   create(context) {
-    const { exclude = [] } = context.options[0] || {}
+    const [{ exclude }] = context.options;
     return {
       CallExpression(node) {
         if (!isPromise(node)) {
-          return
+          return;
         }
 
-        const name = node.callee.property.name
-        const numArgs = node.arguments.length
+        const name = node.callee.property.name;
+        const numArgs = node.arguments.length;
 
         if (exclude.includes(name)) {
-          return
+          return;
         }
 
         // istanbul ignore next -- `isPromise` filters out others
         switch (name) {
-          case 'resolve':
-          case 'reject':
+          case "resolve":
+          case "reject": {
             if (numArgs > 1) {
               context.report({
                 node,
-                messageId: 'requireOneOptionalArgument',
+                messageId: "requireOneOptionalArgument",
                 data: { name, numArgs },
-              })
+              });
             }
-            break
-          case 'then':
+            break;
+          }
+          case "then": {
             if (numArgs < 1 || numArgs > 2) {
               context.report({
                 node,
-                messageId: 'requireTwoOptionalArguments',
+                messageId: "requireTwoOptionalArguments",
                 data: { name, numArgs },
-              })
+              });
             }
-            break
-          case 'race':
-          case 'all':
-          case 'allSettled':
-          case 'any':
-          case 'catch':
-          case 'finally':
+            break;
+          }
+          case "race":
+          case "all":
+          case "allSettled":
+          case "any":
+          case "catch":
+          case "finally": {
             if (numArgs !== 1) {
               context.report({
                 node,
-                messageId: 'requireOneArgument',
+                messageId: "requireOneArgument",
                 data: { name, numArgs },
-              })
+              });
             }
-            break
-          default:
-            // istanbul ignore next -- `isPromise` filters out others
-            break
+            break;
+          }
+          default: {
+            break;
+          }
         }
       },
-    }
+    };
   },
-}
+};

@@ -1,16 +1,13 @@
-'use strict'
-
-const PROMISE_STATICS = require('./lib/promise-statics')
-const getDocsUrl = require('./lib/get-docs-url')
-
-module.exports = {
+import PROMISE_STATICS from "./lib/promise-statics.js";
+import getDocsUrl from "./lib/get-docs-url.js";
+export default {
   meta: {
-    type: 'problem',
+    type: "problem",
     docs: {
-      description: 'Disallow calling `new` on a Promise static method.',
-      url: getDocsUrl('no-new-statics'),
+      description: "Disallow calling `new` on a Promise static method.",
+      url: getDocsUrl("no-new-statics"),
     },
-    fixable: 'code',
+    fixable: "code",
     schema: [],
     messages: {
       avoidNewStatic: "Avoid calling 'new' on 'Promise.{{ name }}()'",
@@ -20,23 +17,20 @@ module.exports = {
     return {
       NewExpression(node) {
         if (
-          node.callee.type === 'MemberExpression' &&
-          node.callee.object.name === 'Promise' &&
+          node.callee.type === "MemberExpression" &&
+          node.callee.object.name === "Promise" &&
           PROMISE_STATICS.has(node.callee.property.name)
         ) {
           context.report({
             node,
-            messageId: 'avoidNewStatic',
+            messageId: "avoidNewStatic",
             data: { name: node.callee.property.name },
             fix(fixer) {
-              return fixer.replaceTextRange(
-                [node.range[0], node.range[0] + 'new '.length],
-                '',
-              )
+              return fixer.replaceTextRange([node.range[0], node.range[0] + "new ".length], "");
             },
-          })
+          });
         }
       },
-    }
+    };
   },
-}
+};

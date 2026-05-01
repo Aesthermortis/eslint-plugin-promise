@@ -1,4 +1,6 @@
-# Prefer `await` to `then()`/`catch()`/`finally()` for reading Promise values (`promise/prefer-await-to-then`)
+# promise/prefer-await-to-then
+
+📝 Prefer `await` to `then()`/`catch()`/`finally()` for reading Promise values.
 
 <!-- end auto-generated rule header -->
 
@@ -6,18 +8,18 @@
 
 ```js
 async function example() {
-  let val = await myPromise()
-  val = doSomethingSync(val)
-  return doSomethingElseAsync(val)
+  let val = await myPromise();
+  val = doSomethingSync(val);
+  return doSomethingElseAsync(val);
 }
 
 async function exampleTwo() {
   try {
-    let val = await myPromise()
-    val = doSomethingSync(val)
-    return await doSomethingElseAsync(val)
+    let val = await myPromise();
+    val = doSomethingSync(val);
+    return await doSomethingElseAsync(val);
   } catch (err) {
-    errors(err)
+    errors(err);
   }
 }
 ```
@@ -26,22 +28,19 @@ async function exampleTwo() {
 
 ```js
 function example() {
-  return myPromise.then(doSomethingSync).then(doSomethingElseAsync)
+  return myPromise.then(doSomethingSync).then(doSomethingElseAsync);
 }
 
 function exampleTwo() {
-  return myPromise
-    .then(doSomethingSync)
-    .then(doSomethingElseAsync)
-    .catch(errors)
+  return myPromise.then(doSomethingSync).then(doSomethingElseAsync).catch(errors);
 }
 
 function exampleThree() {
-  return myPromise.catch(errors)
+  return myPromise.catch(errors);
 }
 
 function exampleFour() {
-  return myPromise.finally(cleanup)
+  return myPromise.finally(cleanup);
 }
 ```
 
@@ -56,6 +55,6 @@ This will fail with the `strict` option:
 
 ```js
 async function hi() {
-  await thing().then()
+  await thing().then();
 }
 ```

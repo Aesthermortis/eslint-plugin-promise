@@ -1,7 +1,8 @@
-# Enforces the proper number of arguments are passed to Promise functions (`promise/valid-params`)
+# promise/valid-params
 
-⚠️ This rule _warns_ in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Enforces the proper number of arguments are passed to Promise functions.
+
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -27,39 +28,39 @@ Examples of **correct** code for this rule:
 
 ```js
 // Promise.all() requires 1 argument
-Promise.all([p1, p2, p3])
-Promise.all(iterable)
+Promise.all([p1, p2, p3]);
+Promise.all(iterable);
 
 // Promise.race() requires 1 argument
-Promise.race([p1, p2, p3])
-Promise.race(iterable)
+Promise.race([p1, p2, p3]);
+Promise.race(iterable);
 
 // Promise.resolve() requires 0 or 1 arguments
-Promise.resolve()
-Promise.resolve({})
-Promise.resolve([1, 2, 3])
-Promise.resolve(referenceToObject)
+Promise.resolve();
+Promise.resolve({});
+Promise.resolve([1, 2, 3]);
+Promise.resolve(referenceToObject);
 
 // Promise.reject() requires 0 or 1 arguments
-Promise.reject()
-Promise.reject(Error())
-Promise.reject(referenceToError)
+Promise.reject();
+Promise.reject(Error());
+Promise.reject(referenceToError);
 
 // Promise.then() requires 1 or 2 arguments
-somePromise().then((value) => doSomething(value))
-somePromise().then(successCallback, errorCallback)
+somePromise().then((value) => doSomething(value));
+somePromise().then(successCallback, errorCallback);
 
 // Promise.catch() requires 1 argument
 somePromise().catch((error) => {
-  handleError(error)
-})
-somePromise().catch(console.error)
+  handleError(error);
+});
+somePromise().catch(console.error);
 
 // Promise.finally() requires 1 argument
 somePromise().finally(() => {
-  console.log('done!')
-})
-somePromise().finally(console.log)
+  console.log("done!");
+});
+somePromise().finally(console.log);
 ```
 
 ## Options

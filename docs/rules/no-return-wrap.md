@@ -1,7 +1,8 @@
-# Disallow wrapping values in `Promise.resolve` or `Promise.reject` when not needed (`promise/no-return-wrap`)
+# promise/no-return-wrap
 
-💼 This rule is enabled in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Disallow wrapping values in `Promise.resolve` or `Promise.reject` when not needed.
+
+💼 This rule is enabled in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -12,22 +13,22 @@ value instead of wrapping in `Promise.resolve` or `Promise.reject`
 
 ```js
 myPromise.then(function (val) {
-  return val * 2
-})
+  return val * 2;
+});
 myPromise.then(function (val) {
-  throw 'bad thing'
-})
+  throw "bad thing";
+});
 ```
 
 #### Invalid
 
 ```js
 myPromise.then(function (val) {
-  return Promise.resolve(val * 2)
-})
+  return Promise.resolve(val * 2);
+});
 myPromise.then(function (val) {
-  return Promise.reject('bad thing')
-})
+  return Promise.reject("bad thing");
+});
 ```
 
 #### Options

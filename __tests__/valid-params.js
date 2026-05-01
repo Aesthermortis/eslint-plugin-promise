@@ -1,65 +1,63 @@
-'use strict'
-
-const rule = require('../rules/valid-params')
-const { RuleTester } = require('./rule-tester')
+import rule from "../rules/valid-params.js";
+import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 6,
   },
-})
+});
 
-ruleTester.run('valid-params', rule, {
+ruleTester.run("valid-params", rule, {
   valid: [
     // valid Promise.resolve()
-    'Promise.resolve()',
-    'Promise.resolve(1)',
-    'Promise.resolve({})',
-    'Promise.resolve(referenceToSomething)',
+    "Promise.resolve()",
+    "Promise.resolve(1)",
+    "Promise.resolve({})",
+    "Promise.resolve(referenceToSomething)",
 
     // valid Promise.reject()
-    'Promise.reject()',
-    'Promise.reject(1)',
-    'Promise.reject({})',
-    'Promise.reject(referenceToSomething)',
-    'Promise.reject(Error())',
+    "Promise.reject()",
+    "Promise.reject(1)",
+    "Promise.reject({})",
+    "Promise.reject(referenceToSomething)",
+    "Promise.reject(Error())",
 
     // valid Promise.race()
-    'Promise.race([])',
-    'Promise.race(iterable)',
-    'Promise.race([one, two, three])',
+    "Promise.race([])",
+    "Promise.race(iterable)",
+    "Promise.race([one, two, three])",
 
     // valid Promise.all()
-    'Promise.all([])',
-    'Promise.all(iterable)',
-    'Promise.all([one, two, three])',
+    "Promise.all([])",
+    "Promise.all(iterable)",
+    "Promise.all([one, two, three])",
 
     // valid Promise.allSettled()
-    'Promise.allSettled([])',
-    'Promise.allSettled(iterable)',
-    'Promise.allSettled([one, two, three])',
+    "Promise.allSettled([])",
+    "Promise.allSettled(iterable)",
+    "Promise.allSettled([one, two, three])",
 
     // valid Promise.any()
-    'Promise.any([])',
-    'Promise.any(iterable)',
-    'Promise.any([one, two, three])',
+    "Promise.any([])",
+    "Promise.any(iterable)",
+    "Promise.any([one, two, three])",
 
     // valid Promise.then()
-    'somePromise().then(success)',
-    'somePromise().then(success, failure)',
-    'promiseReference.then(() => {})',
-    'promiseReference.then(() => {}, () => {})',
+    "somePromise().then(success)",
+    "somePromise().then(success, failure)",
+    "promiseReference.then(() => {})",
+    "promiseReference.then(() => {}, () => {})",
 
     // valid Promise.catch()
-    'somePromise().catch(callback)',
-    'somePromise().catch(err => {})',
-    'promiseReference.catch(callback)',
-    'promiseReference.catch(err => {})',
+    "somePromise().catch(callback)",
+    "somePromise().catch(err => {})",
+    "promiseReference.catch(callback)",
+    "promiseReference.catch(err => {})",
 
     // valid Promise.finally()
-    'somePromise().finally(callback)',
-    'somePromise().finally(() => {})',
-    'promiseReference.finally(callback)',
-    'promiseReference.finally(() => {})',
+    "somePromise().finally(callback)",
+    "somePromise().finally(() => {})",
+    "promiseReference.finally(callback)",
+    "promiseReference.finally(() => {})",
 
     {
       code: `
@@ -72,7 +70,7 @@ ruleTester.run('valid-params', rule, {
       `,
       options: [
         {
-          exclude: ['catch'],
+          exclude: ["catch"],
         },
       ],
     },
@@ -92,172 +90,130 @@ ruleTester.run('valid-params', rule, {
   invalid: [
     // invalid Promise.resolve()
     {
-      code: 'Promise.resolve(1, 2)',
+      code: "Promise.resolve(1, 2)",
       errors: [
         {
-          message:
-            'Promise.resolve() requires 0 or 1 arguments, but received 2',
+          message: "Promise.resolve() requires 0 or 1 arguments, but received 2",
         },
       ],
     },
     {
-      code: 'Promise.resolve({}, function() {}, 1, 2, 3)',
+      code: "Promise.resolve({}, function() {}, 1, 2, 3)",
       errors: [
         {
-          message:
-            'Promise.resolve() requires 0 or 1 arguments, but received 5',
+          message: "Promise.resolve() requires 0 or 1 arguments, but received 5",
         },
       ],
     },
 
     // invalid Promise.reject()
     {
-      code: 'Promise.reject(1, 2, 3)',
+      code: "Promise.reject(1, 2, 3)",
       errors: [
         {
-          message: 'Promise.reject() requires 0 or 1 arguments, but received 3',
+          message: "Promise.reject() requires 0 or 1 arguments, but received 3",
         },
       ],
     },
     {
-      code: 'Promise.reject({}, function() {}, 1, 2)',
+      code: "Promise.reject({}, function() {}, 1, 2)",
       errors: [
         {
-          message: 'Promise.reject() requires 0 or 1 arguments, but received 4',
+          message: "Promise.reject() requires 0 or 1 arguments, but received 4",
         },
       ],
     },
 
     // invalid Promise.race()
     {
-      code: 'Promise.race(1, 2)',
-      errors: [
-        { message: 'Promise.race() requires 1 argument, but received 2' },
-      ],
+      code: "Promise.race(1, 2)",
+      errors: [{ message: "Promise.race() requires 1 argument, but received 2" }],
     },
     {
-      code: 'Promise.race({}, function() {}, 1, 2, 3)',
-      errors: [
-        { message: 'Promise.race() requires 1 argument, but received 5' },
-      ],
+      code: "Promise.race({}, function() {}, 1, 2, 3)",
+      errors: [{ message: "Promise.race() requires 1 argument, but received 5" }],
     },
 
     // invalid Promise.all()
     {
-      code: 'Promise.all(1, 2, 3)',
-      errors: [
-        { message: 'Promise.all() requires 1 argument, but received 3' },
-      ],
+      code: "Promise.all(1, 2, 3)",
+      errors: [{ message: "Promise.all() requires 1 argument, but received 3" }],
     },
     {
-      code: 'Promise.all({}, function() {}, 1, 2)',
-      errors: [
-        { message: 'Promise.all() requires 1 argument, but received 4' },
-      ],
+      code: "Promise.all({}, function() {}, 1, 2)",
+      errors: [{ message: "Promise.all() requires 1 argument, but received 4" }],
     },
     // invalid Promise.allSettled()
     {
-      code: 'Promise.allSettled(1, 2, 3)',
-      errors: [
-        { message: 'Promise.allSettled() requires 1 argument, but received 3' },
-      ],
+      code: "Promise.allSettled(1, 2, 3)",
+      errors: [{ message: "Promise.allSettled() requires 1 argument, but received 3" }],
     },
     {
-      code: 'Promise.allSettled({}, function() {}, 1, 2)',
-      errors: [
-        { message: 'Promise.allSettled() requires 1 argument, but received 4' },
-      ],
+      code: "Promise.allSettled({}, function() {}, 1, 2)",
+      errors: [{ message: "Promise.allSettled() requires 1 argument, but received 4" }],
     },
     // invalid Promise.any()
     {
-      code: 'Promise.any(1, 2, 3)',
-      errors: [
-        { message: 'Promise.any() requires 1 argument, but received 3' },
-      ],
+      code: "Promise.any(1, 2, 3)",
+      errors: [{ message: "Promise.any() requires 1 argument, but received 3" }],
     },
     {
-      code: 'Promise.any({}, function() {}, 1, 2)',
-      errors: [
-        { message: 'Promise.any() requires 1 argument, but received 4' },
-      ],
+      code: "Promise.any({}, function() {}, 1, 2)",
+      errors: [{ message: "Promise.any() requires 1 argument, but received 4" }],
     },
 
     // invalid Promise.then()
     {
-      code: 'somePromise().then()',
-      errors: [
-        { message: 'Promise.then() requires 1 or 2 arguments, but received 0' },
-      ],
+      code: "somePromise().then()",
+      errors: [{ message: "Promise.then() requires 1 or 2 arguments, but received 0" }],
     },
     {
-      code: 'somePromise().then(() => {}, () => {}, () => {})',
-      errors: [
-        { message: 'Promise.then() requires 1 or 2 arguments, but received 3' },
-      ],
+      code: "somePromise().then(() => {}, () => {}, () => {})",
+      errors: [{ message: "Promise.then() requires 1 or 2 arguments, but received 3" }],
     },
     {
-      code: 'promiseReference.then()',
-      errors: [
-        { message: 'Promise.then() requires 1 or 2 arguments, but received 0' },
-      ],
+      code: "promiseReference.then()",
+      errors: [{ message: "Promise.then() requires 1 or 2 arguments, but received 0" }],
     },
     {
-      code: 'promiseReference.then(() => {}, () => {}, () => {})',
-      errors: [
-        { message: 'Promise.then() requires 1 or 2 arguments, but received 3' },
-      ],
+      code: "promiseReference.then(() => {}, () => {}, () => {})",
+      errors: [{ message: "Promise.then() requires 1 or 2 arguments, but received 3" }],
     },
 
     // invalid Promise.catch()
     {
-      code: 'somePromise().catch()',
-      errors: [
-        { message: 'Promise.catch() requires 1 argument, but received 0' },
-      ],
+      code: "somePromise().catch()",
+      errors: [{ message: "Promise.catch() requires 1 argument, but received 0" }],
     },
     {
-      code: 'somePromise().catch(() => {}, () => {})',
-      errors: [
-        { message: 'Promise.catch() requires 1 argument, but received 2' },
-      ],
+      code: "somePromise().catch(() => {}, () => {})",
+      errors: [{ message: "Promise.catch() requires 1 argument, but received 2" }],
     },
     {
-      code: 'promiseReference.catch()',
-      errors: [
-        { message: 'Promise.catch() requires 1 argument, but received 0' },
-      ],
+      code: "promiseReference.catch()",
+      errors: [{ message: "Promise.catch() requires 1 argument, but received 0" }],
     },
     {
-      code: 'promiseReference.catch(() => {}, () => {})',
-      errors: [
-        { message: 'Promise.catch() requires 1 argument, but received 2' },
-      ],
+      code: "promiseReference.catch(() => {}, () => {})",
+      errors: [{ message: "Promise.catch() requires 1 argument, but received 2" }],
     },
 
     // invalid Promise.finally()
     {
-      code: 'somePromise().finally()',
-      errors: [
-        { message: 'Promise.finally() requires 1 argument, but received 0' },
-      ],
+      code: "somePromise().finally()",
+      errors: [{ message: "Promise.finally() requires 1 argument, but received 0" }],
     },
     {
-      code: 'somePromise().finally(() => {}, () => {})',
-      errors: [
-        { message: 'Promise.finally() requires 1 argument, but received 2' },
-      ],
+      code: "somePromise().finally(() => {}, () => {})",
+      errors: [{ message: "Promise.finally() requires 1 argument, but received 2" }],
     },
     {
-      code: 'promiseReference.finally()',
-      errors: [
-        { message: 'Promise.finally() requires 1 argument, but received 0' },
-      ],
+      code: "promiseReference.finally()",
+      errors: [{ message: "Promise.finally() requires 1 argument, but received 0" }],
     },
     {
-      code: 'promiseReference.finally(() => {}, () => {})',
-      errors: [
-        { message: 'Promise.finally() requires 1 argument, but received 2' },
-      ],
+      code: "promiseReference.finally(() => {}, () => {})",
+      errors: [{ message: "Promise.finally() requires 1 argument, but received 2" }],
     },
   ],
-})
+});

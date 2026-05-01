@@ -1,33 +1,31 @@
-'use strict'
-
-const rule = require('../rules/prefer-await-to-then')
-const { RuleTester } = require('./rule-tester')
+import rule from "../rules/prefer-await-to-then.js";
+import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 8,
   },
-})
+});
 
-const message = 'Prefer await to then()/catch()/finally().'
+const message = "Prefer await to then()/catch()/finally().";
 
-ruleTester.run('prefer-await-to-then', rule, {
+ruleTester.run("prefer-await-to-then", rule, {
   valid: [
-    'async function hi() { await thing() }',
-    'async function hi() { await thing().then() }',
-    'async function hi() { await thing().catch() }',
-    'async function hi() { await thing().finally() }',
+    "async function hi() { await thing() }",
+    "async function hi() { await thing().then() }",
+    "async function hi() { await thing().catch() }",
+    "async function hi() { await thing().finally() }",
 
     // Cypress
     'function hi() { cy.get(".myClass").then(go) }',
     'function hi() { cy.get("button").click().then() }',
 
-    'function * hi() { yield thing().then() }',
-    'a = async () => (await something())',
+    "function * hi() { yield thing().then() }",
+    "a = async () => (await something())",
     `a = async () => {
       try { await something() } catch (error) { somethingElse() }
     }`,
-    'something().then(async () => await somethingElse())',
-    'function foo() { hey.somethingElse(x => {}) }',
+    "something().then(async () => await somethingElse())",
+    "function foo() { hey.somethingElse(x => {}) }",
     `const isThenable = (obj) => {
       return obj && typeof obj.then === 'function';
     };`,
@@ -43,31 +41,31 @@ ruleTester.run('prefer-await-to-then', rule, {
 
   invalid: [
     {
-      code: 'function foo() { hey.then(x => {}) }',
+      code: "function foo() { hey.then(x => {}) }",
       errors: [{ message }],
     },
     {
-      code: 'function foo() { hey.then(function() { }).then() }',
+      code: "function foo() { hey.then(function() { }).then() }",
       errors: [{ message }, { message }],
     },
     {
-      code: 'function foo() { hey.then(function() { }).then(x).catch() }',
+      code: "function foo() { hey.then(function() { }).then(x).catch() }",
       errors: [{ message }, { message }, { message }],
     },
     {
-      code: 'async function a() { hey.then(function() { }).then(function() { }) }',
+      code: "async function a() { hey.then(function() { }).then(function() { }) }",
       errors: [{ message }, { message }],
     },
     {
-      code: 'function foo() { hey.catch(x => {}) }',
+      code: "function foo() { hey.catch(x => {}) }",
       errors: [{ message }],
     },
     {
-      code: 'function foo() { hey.finally(x => {}) }',
+      code: "function foo() { hey.finally(x => {}) }",
       errors: [{ message }],
     },
     {
-      code: 'async function hi() { await thing().then() }',
+      code: "async function hi() { await thing().then() }",
       errors: [{ message }],
       options: [
         {
@@ -89,7 +87,7 @@ ruleTester.run('prefer-await-to-then', rule, {
       ],
     },
     {
-      code: 'async function hi() { await thing().catch() }',
+      code: "async function hi() { await thing().catch() }",
       errors: [{ message }],
       options: [
         {
@@ -98,7 +96,7 @@ ruleTester.run('prefer-await-to-then', rule, {
       ],
     },
     {
-      code: 'async function hi() { await thing().finally() }',
+      code: "async function hi() { await thing().finally() }",
       errors: [{ message }],
       options: [
         {
@@ -107,7 +105,7 @@ ruleTester.run('prefer-await-to-then', rule, {
       ],
     },
     {
-      code: 'function * hi() { yield thing().then() }',
+      code: "function * hi() { yield thing().then() }",
       errors: [{ message }],
       options: [
         {
@@ -116,4 +114,4 @@ ruleTester.run('prefer-await-to-then', rule, {
       ],
     },
   ],
-})
+});

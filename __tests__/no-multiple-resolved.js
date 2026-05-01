@@ -1,14 +1,12 @@
-'use strict'
-
-const rule = require('../rules/no-multiple-resolved')
-const { RuleTester } = require('./rule-tester')
+import rule from "../rules/no-multiple-resolved.js";
+import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2020,
   },
-})
+});
 
-ruleTester.run('no-multiple-resolved', rule, {
+ruleTester.run("no-multiple-resolved", rule, {
   valid: [
     `new Promise((resolve, reject) => {
       fn((error, value) => {
@@ -173,7 +171,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 5.",
           line: 8,
         },
       ],
@@ -190,7 +188,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 4.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 4.",
           line: 7,
         },
       ],
@@ -204,7 +202,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is already resolved on line 3.',
+            "Promise should not be resolved multiple times. Promise is already resolved on line 3.",
           line: 4,
         },
       ],
@@ -228,7 +226,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 5.",
           line: 13,
         },
       ],
@@ -249,7 +247,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 6.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 6.",
           line: 10,
         },
       ],
@@ -270,7 +268,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is already resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is already resolved on line 5.",
           line: 10,
         },
       ],
@@ -292,12 +290,12 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is already resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is already resolved on line 5.",
           line: 9,
         },
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 9.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 9.",
           line: 12,
         },
       ],
@@ -317,7 +315,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is already resolved on line 4.',
+            "Promise should not be resolved multiple times. Promise is already resolved on line 4.",
           line: 9,
         },
       ],
@@ -333,7 +331,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 4.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 4.",
           line: 6,
         },
       ],
@@ -350,7 +348,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is already resolved on line 4.',
+            "Promise should not be resolved multiple times. Promise is already resolved on line 4.",
           line: 6,
         },
       ],
@@ -369,7 +367,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 5.",
           line: 8,
         },
       ],
@@ -387,7 +385,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 4.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 4.",
           line: 7,
         },
       ],
@@ -406,7 +404,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 5.",
           line: 8,
         },
       ],
@@ -425,7 +423,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 5.",
           line: 8,
         },
       ],
@@ -444,7 +442,7 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 5.",
           line: 8,
         },
       ],
@@ -464,10 +462,10 @@ ruleTester.run('no-multiple-resolved', rule, {
       errors: [
         {
           message:
-            'Promise should not be resolved multiple times. Promise is potentially resolved on line 5.',
+            "Promise should not be resolved multiple times. Promise is potentially resolved on line 5.",
           line: 8,
         },
       ],
     },
   ],
-})
+});

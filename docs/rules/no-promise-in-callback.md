@@ -1,7 +1,8 @@
-# Disallow using promises inside of callbacks (`promise/no-promise-in-callback`)
+# promise/no-promise-in-callback
 
-⚠️ This rule _warns_ in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Disallow using promises inside of callbacks.
+
+⚠️ This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -16,18 +17,15 @@ Examples of **incorrect** code for this rule:
 
 ```js
 doSomething((err, val) => {
-  if (err) console.error(err)
-  else doSomethingElse(val).then(console.log)
-})
+  if (err) console.error(err);
+  else doSomethingElse(val).then(console.log);
+});
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-promisify(doSomething)()
-  .then(doSomethingElse)
-  .then(console.log)
-  .catch(console.error)
+promisify(doSomething)().then(doSomethingElse).then(console.log).catch(console.error);
 ```
 
 ## Options

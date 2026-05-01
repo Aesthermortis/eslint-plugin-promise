@@ -1,37 +1,37 @@
+import PROMISE_STATICS from "./promise-statics.js";
+
 /**
- * Library: isPromise
- * Makes sure that an Expression node is part of a promise.
+ * Check whether an expression belongs to a Promise chain or Promise static call.
+ *
+ * @param {import("eslint").Rule.Node} expression - The AST expression node to evaluate.
+ * @returns {boolean} Whether the expression is recognized as promise-related.
  */
-'use strict'
-
-const PROMISE_STATICS = require('./promise-statics')
-
 function isPromise(expression) {
   return (
     // hello.then()
-    (expression.type === 'CallExpression' &&
-      expression.callee.type === 'MemberExpression' &&
-      expression.callee.property.name === 'then') ||
+    (expression.type === "CallExpression" &&
+      expression.callee.type === "MemberExpression" &&
+      expression.callee.property.name === "then") ||
     // hello.catch()
-    (expression.type === 'CallExpression' &&
-      expression.callee.type === 'MemberExpression' &&
-      expression.callee.property.name === 'catch') ||
+    (expression.type === "CallExpression" &&
+      expression.callee.type === "MemberExpression" &&
+      expression.callee.property.name === "catch") ||
     // hello.finally()
-    (expression.type === 'CallExpression' &&
-      expression.callee.type === 'MemberExpression' &&
-      expression.callee.property.name === 'finally') ||
+    (expression.type === "CallExpression" &&
+      expression.callee.type === "MemberExpression" &&
+      expression.callee.property.name === "finally") ||
     // somePromise.ANYTHING()
-    (expression.type === 'CallExpression' &&
-      expression.callee.type === 'MemberExpression' &&
+    (expression.type === "CallExpression" &&
+      expression.callee.type === "MemberExpression" &&
       isPromise(expression.callee.object)) ||
     // Promise.STATIC_METHOD()
-    (expression.type === 'CallExpression' &&
-      expression.callee.type === 'MemberExpression' &&
-      expression.callee.object.type === 'Identifier' &&
-      expression.callee.object.name === 'Promise' &&
+    (expression.type === "CallExpression" &&
+      expression.callee.type === "MemberExpression" &&
+      expression.callee.object.type === "Identifier" &&
+      expression.callee.object.name === "Promise" &&
       PROMISE_STATICS.has(expression.callee.property.name) &&
-      expression.callee.property.name !== 'withResolvers')
-  )
+      expression.callee.property.name !== "withResolvers")
+  );
 }
 
-module.exports = isPromise
+export default isPromise;

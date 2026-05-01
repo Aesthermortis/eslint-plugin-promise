@@ -1,36 +1,38 @@
 // Borrowed from here:
 // https://github.com/colonyamerican/eslint-plugin-cah/issues/3
 
-'use strict'
+import getDocsUrl from "./lib/get-docs-url.js";
 
-const { getScope } = require('./lib/eslint-compat')
-const getDocsUrl = require('./lib/get-docs-url')
+/**
+ * @typedef {import("eslint").Scope.Reference} Reference
+ * @typedef {import("eslint").Scope.Scope} Scope
+ */
 
-function isDeclared(scope, ref) {
+/**
+ * Checks whether a reference is declared in the current scope.
+ *
+ * @param {Scope} scope Scope to inspect.
+ * @param {Reference} reference Reference to match.
+ * @returns {boolean} Whether the reference has a local declaration.
+ */
+function isDeclared(scope, reference) {
   return scope.variables.some((variable) => {
-    if (variable.name !== ref.identifier.name) {
-      return false
-    }
-
-    // Presumably can't pass this since the implicit `Promise` global
-    //  being checked here would always lack `defs`
-    // istanbul ignore else
-    if (!variable.defs || !variable.defs.length) {
-      return false
+    if (variable.name !== reference.identifier.name) {
+      return false;
     }
 
     // istanbul ignore next
-    return true
-  })
+    return variable.defs.length > 0;
+  });
 }
 
-module.exports = {
+export default {
   meta: {
-    type: 'suggestion',
+    type: "suggestion",
     docs: {
       description:
-        'Require creating a `Promise` constructor before using it in an ES5 environment.',
-      url: getDocsUrl('no-native'),
+        "Require creating a `Promise` constructor before using it in an ES5 environment.",
+      url: getDocsUrl("no-native"),
     },
     messages: {
       name: '"{{name}}" is not defined.',
@@ -38,40 +40,41 @@ module.exports = {
     schema: [],
   },
   create(context) {
-    /**
-     * Checks for and reports reassigned constants
-     *
-     * @param {Scope} scope - an eslint-scope Scope object
-     * @returns {void}
-     * @private
-     */
     return {
-      'Program:exit'(node) {
-        const scope = getScope(context, node)
-        const leftToBeResolved =
-          scope.implicit.left ||
-          /**
-           * Fixes https://github.com/eslint-community/eslint-plugin-promise/issues/205.
-           * The problem was that @typescript-eslint has a scope manager
-           * which has `leftToBeResolved` instead of the default `left`.
-           */
-          scope.implicit.leftToBeResolved
+      "Program:exit"() {
+        const globalScope = context.sourceCode.scopeManager.globalScope;
 
-        leftToBeResolved.forEach((ref) => {
-          if (ref.identifier.name !== 'Promise') {
-            return
+        for (const variable of globalScope.variables) {
+          if (variable.name === "Promise") {
+            for (const reference of variable.references) {
+              validatePromiseReference(globalScope, reference);
+            }
           }
+        }
 
-          // istanbul ignore else
-          if (!isDeclared(scope, ref)) {
+        for (const reference of globalScope.through) {
+          if (reference.identifier.name === "Promise") {
+            validatePromiseReference(globalScope, reference);
+          }
+        }
+
+        /**
+         * Reports references that use the native Promise global.
+         *
+         * @param {Scope} scope Scope that owns the reference.
+         * @param {Reference} reference Reference to validate.
+         * @returns {void}
+         */
+        function validatePromiseReference(scope, reference) {
+          if (!isDeclared(scope, reference)) {
             context.report({
-              node: ref.identifier,
-              messageId: 'name',
-              data: { name: ref.identifier.name },
-            })
+              node: reference.identifier,
+              messageId: "name",
+              data: { name: reference.identifier.name },
+            });
           }
-        })
+        }
       },
-    }
+    };
   },
-}
+};

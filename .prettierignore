@@ -1,3 +1,4 @@
 .github/release-please/manifest.json
 coverage
 CHANGELOG.md
+.gitattributes

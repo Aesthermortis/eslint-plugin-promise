@@ -1,7 +1,8 @@
-# Disallow creating `new` promises outside of utility libs (use [util.promisify][] instead) (`promise/avoid-new`)
+# promise/avoid-new
 
-🚫 This rule is _disabled_ in the following configs: ✅ `flat/recommended`, ✅
-`recommended`.
+📝 Disallow creating `new` promises outside of utility libs (use [util.promisify][] instead).
+
+🚫 This rule is _disabled_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -22,24 +23,22 @@ Examples of **incorrect** code for this rule:
 ```js
 function promisifiedFn(arg) {
   return new Promise((resolve, reject) => {
-    callbackStyleFn(arg, (error, result) =>
-      error ? reject(error) : resolve(result),
-    )
-  })
+    callbackStyleFn(arg, (error, result) => (error ? reject(error) : resolve(result)));
+  });
 }
 
-new Promise((resolve, reject) => resolve(1))
-new Promise((resolve, reject) => reject(new Error('oops')))
+new Promise((resolve, reject) => resolve(1));
+new Promise((resolve, reject) => reject(new Error("oops")));
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-import util from 'util'
-const promisifiedFn = util.promisify(callbackStyleFn)
+import util from "util";
+const promisifiedFn = util.promisify(callbackStyleFn);
 
-Promise.resolve(1)
-Promise.reject(new Error('oops'))
+Promise.resolve(1);
+Promise.reject(new Error("oops"));
 ```
 
 ## When Not To Use It

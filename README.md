@@ -2,90 +2,55 @@
 
 Enforce best practices for JavaScript promises.
 
-[![CI](https://github.com/eslint-community/eslint-plugin-promise/actions/workflows/ci.yml/badge.svg)](https://github.com/eslint-community/eslint-plugin-promise/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/eslint-plugin-promise.svg)](https://www.npmjs.com/package/eslint-plugin-promise)
+[![CI](https://github.com/Aesthermortis/eslint-plugin-promise/actions/workflows/ci.yml/badge.svg)](https://github.com/Aesthermortis/eslint-plugin-promise/actions/workflows/ci.yml)
+[![ESLint](https://img.shields.io/badge/lint-ESLint-4B32C3.svg)](https://eslint.org/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Rules](#rules)
-- [Maintainers](#maintainers)
-- [License](#license)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Installation
 
-You'll first need to install [ESLint](http://eslint.org):
+Install ESLint and `eslint-plugin-promise` as development dependencies:
 
 ```sh
-npm install eslint --save-dev
+npm i -D eslint github:Aesthermortis/eslint-plugin-promise
 ```
-
-Next, install `eslint-plugin-promise`:
-
-```sh
-npm install eslint-plugin-promise --save-dev
-```
-
-**Note:** If you installed ESLint globally (using the `-g` flag) then you must
-also install `eslint-plugin-promise` globally.
 
 ## Usage
 
-Add `promise` to the plugins section of your `.eslintrc.json` configuration
-file. You can omit the `eslint-plugin-` prefix:
+Use the recommended configuration in `eslint.config.js`:
 
-```json
-{
-  "plugins": ["promise"]
-}
+```js
+import pluginPromise from "eslint-plugin-promise";
+
+export default [pluginPromise.configs.recommended];
 ```
 
-Then configure the rules you want to use under the rules section.
+You can also configure individual rules manually:
 
-```json
-{
-  "rules": {
-    "promise/always-return": "error",
-    "promise/no-return-wrap": "error",
-    "promise/param-names": "error",
-    "promise/catch-or-return": "error",
-    "promise/no-native": "off",
-    "promise/no-nesting": "warn",
-    "promise/no-promise-in-callback": "warn",
-    "promise/no-callback-in-promise": "warn",
-    "promise/avoid-new": "warn",
-    "promise/no-new-statics": "error",
-    "promise/no-return-in-finally": "warn",
-    "promise/valid-params": "warn",
-    "promise/no-multiple-resolved": "error"
-  }
-}
-```
+```js
+import pluginPromise from "eslint-plugin-promise";
 
-or start with the recommended rule set:
-
-- `eslint.config.js`:
-
-  ```js
-  import pluginPromise from 'eslint-plugin-promise'
-  export default [
-    // ...
-    pluginPromise.configs['flat/recommended'],
-  ]
-  ```
-
-- `.eslintrc.*`:
-
-  ```json
+export default [
   {
-    "extends": ["plugin:promise/recommended"]
-  }
-  ```
+    plugins: {
+      promise: pluginPromise,
+    },
+    rules: {
+      "promise/always-return": "error",
+      "promise/no-return-wrap": "error",
+      "promise/param-names": "error",
+      "promise/catch-or-return": "error",
+      "promise/no-new-statics": "error",
+      "promise/no-multiple-resolved": "error",
+    },
+  },
+];
+```
 
 ## Rules
 
@@ -94,10 +59,8 @@ or start with the recommended rule set:
 💼 Configurations enabled in.\
 ⚠️ Configurations set to warn in.\
 🚫 Configurations disabled in.\
-✅ Set in the `flat/recommended` configuration.\
 ✅ Set in the `recommended` configuration.\
-🔧 Automatically fixable by the
-[`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).
+🔧 Automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).
 
 | Name                                                                 | Description                                                                                | 💼  | ⚠️  | 🚫  | 🔧  |
 | :------------------------------------------------------------------- | :----------------------------------------------------------------------------------------- | :-- | :-- | :-- | :-- |
@@ -121,20 +84,5 @@ or start with the recommended rule set:
 
 <!-- end auto-generated rules list -->
 
-## Maintainers
-
-- Jamund Ferguson - [@xjamundx][]
-- Macklin Underdown - [@macklinu][]
-- Aadit M Shah - [@aaditmshah][]
-
-## License
-
-- (c) MMXV jden <mailto:jason@denizac.org> - ISC license.
-- (c) 2016 Jamund Ferguson <mailto:jamund@gmail.com> - ISC license.
-
-[util.callbackify]:
-  https://nodejs.org/docs/latest/api/util.html#utilcallbackifyoriginal
+[util.callbackify]: https://nodejs.org/docs/latest/api/util.html#utilcallbackifyoriginal
 [util.promisify]: https://nodejs.org/api/util.html#util_util_promisify_original
-[@aaditmshah]: https://github.com/aaditmshah
-[@macklinu]: https://github.com/macklinu
-[@xjamundx]: https://github.com/xjamundx

@@ -1,9 +1,13 @@
 name: CI
+
 on:
   push:
     branches:
       - main
   pull_request:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,67 +15,58 @@ concurrency:
 
 jobs:
   lint:
-    name: ⬣ Lint
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: ⎔ Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          cache: npm
+          node-version: 24
 
-      - name: 📥 Install dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: npm ci --no-audit --fund=false --include=dev
 
-      - name: ▶️ Run lint script
+      - name: Run lint
         run: npm run lint
 
   test:
-    name:
-      🧪 Test (Node@${{ matrix.node }} - ESLint@${{ matrix.eslint }} - ${{
-      matrix.os }})
-    strategy:
-      matrix:
-        eslint: [8]
-        node: [18.18.0, 20.9.0, 21.1.0, 22]
-        os: [ubuntu-latest]
-        include:
-          # ESLint v9
-          - eslint: 9
-            node: 22
-            os: ubuntu-latest
-          # On other platforms
-          - os: windows-latest
-            eslint: 8
-            node: 22
-          - os: macos-latest
-            eslint: 8
-            node: 22
-          # On the minimum supported ESLint/Node.js version
-          - eslint: 7.0.0
-            node: 18.18.0
-            os: ubuntu-latest
-    runs-on: ${{ matrix.os }}
+    name: Test
+    runs-on: ubuntu-latest
     steps:
-      - name: ⬇️ Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: ⎔ Setup Node v${{ matrix.node }}
-        uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
           cache: npm
-          node-version: ${{ matrix.node }}
+          node-version: 24
 
-      - name: 📥 Install dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: npm ci --no-audit --fund=false --include=dev
 
-      - name: 📥 Install ESLint v${{ matrix.eslint }}
-        run: npm install eslint@${{ matrix.eslint }}
+      - name: Run coverage
+        run: npm run test:coverage -- --runInBand
 
-      - name: ▶️ Run test script
-        run: npm run test -- --runInBand
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - name: ⬆️ Upload coverage report
-        uses: codecov/codecov-action@v4
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          cache: npm
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm ci --no-audit --fund=false --include=dev
+
+      - name: Run build
+        run: npm run build

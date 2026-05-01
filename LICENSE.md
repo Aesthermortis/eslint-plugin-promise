@@ -1,4 +1,8 @@
-Copyright (c) 2020, Jamund Ferguson
+ISC License
+
+Copyright (c) 2015 jden <jason@denizac.org><br>
+Copyright (c) 2020, Jamund Ferguson <jamund@gmail.com><br>
+Copyright (c) 2026 Aesthermortis
 
 Permission to use, copy, modify, and/or distribute this software for any purpose
 with or without fee is hereby granted, provided that the above copyright notice
