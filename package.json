@@ -18,10 +18,6 @@
   "funding": "https://opencollective.com/eslint",
   "license": "ISC",
   "author": "Aesthermortis",
-  "contributors": [
-    "Brett Zamir",
-    "Aadit M Shah <aaditmshah@aadit.codes> (https://aadit.codes/)"
-  ],
   "type": "module",
   "exports": {
     ".": {
