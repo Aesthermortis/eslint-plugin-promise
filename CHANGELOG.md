@@ -1,5 +1,16 @@
 # Changelog
 
+## [8.0.0](https://github.com/Aesthermortis/eslint-plugin-promise/compare/v7.2.1...v8.0.0) (2026-05-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **config:** CommonJS usage, legacy eslintrc configuration, and older ESLint compatibility paths are no longer supported.
+
+### 🧹 Chores
+
+* **config:** migrate plugin to ESM and ESLint 10 ([36ad103](https://github.com/Aesthermortis/eslint-plugin-promise/commit/36ad103d054f1b74c2c01b32629e9a170d492777))
+
 ## [7.2.1](https://github.com/eslint-community/eslint-plugin-promise/compare/v7.2.0...v7.2.1) (2024-11-26)
 
 
