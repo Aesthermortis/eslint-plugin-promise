@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.0.0](https://github.com/Aesthermortis/eslint-plugin-promise/compare/v8.0.0...v9.0.0) (2026-05-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** named configs and rules exports are no longer available. Use the default plugin export instead.
+
+### 🧹 Chores
+
+* **api:** expose plugin through default export ([2e7b0c5](https://github.com/Aesthermortis/eslint-plugin-promise/commit/2e7b0c55aa3e0dad5446ad58265b7f8e6988b74b))
+* **config:** extract recommended rules config ([66057b5](https://github.com/Aesthermortis/eslint-plugin-promise/commit/66057b5077d210f3efbcfaa68a51a64029676c24))
+
 ## [8.0.0](https://github.com/Aesthermortis/eslint-plugin-promise/compare/v7.2.1...v8.0.0) (2026-05-01)
 
 
