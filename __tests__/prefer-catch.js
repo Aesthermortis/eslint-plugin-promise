@@ -1,4 +1,4 @@
-import rule from "../rules/prefer-catch.js";
+import rule from "../src/rules/prefer-catch.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

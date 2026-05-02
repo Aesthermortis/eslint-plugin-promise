@@ -1,4 +1,4 @@
-import rule from "../rules/no-return-wrap.js";
+import rule from "../src/rules/no-return-wrap.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

@@ -1,4 +1,4 @@
-import rule from "../rules/valid-params.js";
+import rule from "../src/rules/valid-params.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

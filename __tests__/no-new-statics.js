@@ -1,4 +1,4 @@
-import rule from "../rules/no-new-statics.js";
+import rule from "../src/rules/no-new-statics.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester();
 

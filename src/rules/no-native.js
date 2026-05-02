@@ -26,6 +26,7 @@ function isDeclared(scope, reference) {
   });
 }
 
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

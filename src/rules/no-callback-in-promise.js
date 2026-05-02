@@ -26,6 +26,7 @@ const isInsideTimeout = (node) => {
   return isInCB;
 };
 
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

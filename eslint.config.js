@@ -26,6 +26,7 @@ export default defineConfig([
       "coverage/**",
       "dist/**",
       "docs/**",
+      "**/*.d.ts",
       "node_modules/**",
       "package-lock.json",
       "types/**",
@@ -87,7 +88,7 @@ export default defineConfig([
 
   {
     name: "Plugin Development",
-    files: ["index.js", "rules/**/*.js", "__tests__/**/*.js"],
+    files: ["src/index.js", "src/rules/**/*.js", "__tests__/**/*.js"],
     extends: [eslintPlugin.configs.recommended],
   },
 

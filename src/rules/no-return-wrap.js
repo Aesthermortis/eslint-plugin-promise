@@ -34,6 +34,7 @@ function isInPromise(context, node) {
   return functionNode && functionNode.parent && isPromise(functionNode.parent);
 }
 
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

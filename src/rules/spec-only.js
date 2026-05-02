@@ -32,6 +32,7 @@ function isPermittedProperty(expression, standardSet, allowedMethods) {
   return false;
 }
 
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "problem",

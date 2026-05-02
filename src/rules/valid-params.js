@@ -1,5 +1,7 @@
 import getDocsUrl from "./lib/get-docs-url.js";
 import isPromise from "./lib/is-promise.js";
+
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "problem",

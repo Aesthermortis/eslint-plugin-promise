@@ -1,4 +1,4 @@
-import rule from "../rules/no-callback-in-promise.js";
+import rule from "../src/rules/no-callback-in-promise.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

@@ -21,22 +21,24 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
+  "types": "./index.d.ts",
   "files": [
     "dist",
     "docs",
-    "LICENSE.md",
+    "index.d.ts",
+    "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "prebuild": "node -e \"const fs=require('node:fs'); for (const dir of ['dist','types']) fs.rmSync(dir,{recursive:true,force:true});\"",
-    "build": "tsc -p tsconfig.build.json && rollup -c",
+    "prebuild": "node -e \"const fs=require('node:fs'); for (const dir of ['dist']) fs.rmSync(dir,{recursive:true,force:true});\"",
+    "build": "rollup -c",
     "docs:check": "eslint-doc-generator --check",
     "predocs:update": "npm run build",
     "docs:update": "eslint-doc-generator",
@@ -49,7 +51,8 @@
     "prepare": "husky && npm run build",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
-    "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch"
+    "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
+    "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@eslint-community/eslint-utils": "^4.9.1"

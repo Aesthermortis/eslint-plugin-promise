@@ -1,4 +1,4 @@
-import rule from "../rules/prefer-await-to-callbacks.js";
+import rule from "../src/rules/prefer-await-to-callbacks.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

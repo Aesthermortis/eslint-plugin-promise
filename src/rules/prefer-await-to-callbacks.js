@@ -72,6 +72,7 @@ function hasErrorFirstParameter(callbackArg) {
   return ERROR_NAMES.has(firstParam?.name);
 }
 
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

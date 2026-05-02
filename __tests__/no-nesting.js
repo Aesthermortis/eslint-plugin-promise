@@ -1,4 +1,4 @@
-import rule from "../rules/no-nesting.js";
+import rule from "../src/rules/no-nesting.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

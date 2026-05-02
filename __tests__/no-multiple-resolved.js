@@ -1,4 +1,4 @@
-import rule from "../rules/no-multiple-resolved.js";
+import rule from "../src/rules/no-multiple-resolved.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

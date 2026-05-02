@@ -6,6 +6,8 @@
 import getDocsUrl from "./lib/get-docs-url.js";
 import isPromise from "./lib/is-promise.js";
 import isInsideCallback from "./lib/is-inside-callback.js";
+
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

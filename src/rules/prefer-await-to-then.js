@@ -5,6 +5,8 @@
 
 import getDocsUrl from "./lib/get-docs-url.js";
 import isMemberCallWithObjectName from "./lib/is-member-call-with-object-name.js";
+
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

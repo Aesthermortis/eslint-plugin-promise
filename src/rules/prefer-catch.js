@@ -5,6 +5,8 @@
 
 import getDocsUrl from "./lib/get-docs-url.js";
 import removeArgument from "./fix/remove-argument.js";
+
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

@@ -1,4 +1,4 @@
-import rule from "../rules/param-names.js";
+import rule from "../src/rules/param-names.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

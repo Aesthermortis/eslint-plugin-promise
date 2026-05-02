@@ -1,5 +1,5 @@
 import { RuleTester } from "./rule-tester.js";
-import rule from "../rules/no-return-in-finally.js";
+import rule from "../src/rules/no-return-in-finally.js";
 const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 6,

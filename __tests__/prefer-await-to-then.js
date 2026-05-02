@@ -1,4 +1,4 @@
-import rule from "../rules/prefer-await-to-then.js";
+import rule from "../src/rules/prefer-await-to-then.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

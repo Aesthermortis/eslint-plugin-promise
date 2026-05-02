@@ -1,4 +1,4 @@
-import rule from "../rules/always-return.js";
+import rule from "../src/rules/always-return.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester({
   parserOptions: {

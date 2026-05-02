@@ -10,7 +10,7 @@ const config = {
       statements: 100,
     },
   },
-  collectCoverageFrom: ["rules/*.js", "rules/*/*.js"],
+  collectCoverageFrom: ["src/rules/*.js", "src/rules/*/*.js"],
   testPathIgnorePatterns: ["__tests__/rule-tester.js"],
 };
 

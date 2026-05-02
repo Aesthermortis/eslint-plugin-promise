@@ -12,6 +12,7 @@ function compilePattern(pattern) {
   return new RegExp(pattern, "u");
 }
 
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

@@ -4,6 +4,8 @@
  */
 
 import getDocsUrl from "./lib/get-docs-url.js";
+
+/** @type {import("eslint").Rule.RuleModule} */
 export default {
   meta: {
     type: "suggestion",

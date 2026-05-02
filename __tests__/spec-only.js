@@ -1,4 +1,4 @@
-import rule from "../rules/spec-only.js";
+import rule from "../src/rules/spec-only.js";
 import { RuleTester } from "./rule-tester.js";
 const ruleTester = new RuleTester();
 
