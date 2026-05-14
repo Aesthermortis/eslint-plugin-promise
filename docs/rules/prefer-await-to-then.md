@@ -2,9 +2,11 @@
 
 📝 Prefer `await` to `then()`/`catch()`/`finally()` for reading Promise values.
 
+💼 This rule is enabled in the 🌐 `all` config.
+
 <!-- end auto-generated rule header -->
 
-#### Valid
+## Valid
 
 ```js
 async function example() {
@@ -24,7 +26,7 @@ async function exampleTwo() {
 }
 ```
 
-#### Invalid
+## Invalid
 
 ```js
 function example() {

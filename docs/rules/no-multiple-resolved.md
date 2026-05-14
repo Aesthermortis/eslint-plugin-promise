@@ -2,12 +2,14 @@
 
 📝 Disallow creating new promises with paths that resolve multiple times.
 
+💼 This rule is enabled in the 🌐 `all` config.
+
 <!-- end auto-generated rule header -->
 
 This rule warns of paths that resolve multiple times in executor functions that
 Promise constructors.
 
-#### Valid
+## Valid
 
 ```js
 new Promise((resolve, reject) => {
@@ -21,7 +23,7 @@ new Promise((resolve, reject) => {
 });
 ```
 
-#### Invalid
+## Invalid
 
 ```js
 new Promise((resolve, reject) => {

@@ -2,7 +2,7 @@
 
 📝 Require returning inside each `then()` to create readable and reusable Promise chains.
 
-💼 This rule is enabled in the ✅ `recommended` config.
+💼 This rule is enabled in the following configs: 🌐 `all`, ✅ `recommended`.
 
 <!-- end auto-generated rule header -->
 
@@ -13,7 +13,7 @@ for more info on why that's a good idea.
 We also allow someone to `throw` inside a `then()` which is essentially the same
 as `return Promise.reject()`.
 
-#### Valid
+## Valid
 
 ```js
 myPromise.then((val) => val * 2);
@@ -30,7 +30,7 @@ myPromise.then((b) => {
 });
 ```
 
-#### Invalid
+## Invalid
 
 ```js
 myPromise.then(function (val) {});
@@ -46,9 +46,9 @@ myPromise.then((b) => {
 });
 ```
 
-#### Options
+## Options
 
-##### `ignoreLastCallback`
+### `ignoreLastCallback`
 
 You can pass an `{ ignoreLastCallback: true }` as an option to this rule so that
 the last `then()` callback in a promise chain does not warn if it does not have
@@ -94,7 +94,7 @@ function foo() {
 }
 ```
 
-##### `ignoreAssignmentVariable`
+### `ignoreAssignmentVariable`
 
 You can pass an `{ ignoreAssignmentVariable: [] }` as an option to this rule
 with a list of variable names so that the last `then()` callback in a promise

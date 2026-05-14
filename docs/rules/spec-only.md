@@ -2,6 +2,8 @@
 
 📝 Disallow use of non-standard Promise static methods.
 
+💼 This rule is enabled in the 🌐 `all` config.
+
 <!-- end auto-generated rule header -->
 
 It may become difficult to migrate code depending on non-standard Promise

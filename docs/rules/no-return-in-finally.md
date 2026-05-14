@@ -2,14 +2,14 @@
 
 📝 Disallow return statements in `finally()`.
 
-⚠️ This rule _warns_ in the ✅ `recommended` config.
+💼⚠️ This rule is enabled in the 🌐 `all` config. This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
 Disallow return statements inside a callback passed to `finally()`, since
 nothing would consume what's returned.
 
-#### Valid
+## Valid
 
 ```js
 myPromise.finally(function (val) {
@@ -17,7 +17,7 @@ myPromise.finally(function (val) {
 });
 ```
 
-#### Invalid
+## Invalid
 
 ```js
 myPromise.finally(function (val) {

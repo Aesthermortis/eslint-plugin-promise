@@ -2,13 +2,13 @@
 
 📝 Enforce consistent param names and ordering when creating new promises.
 
-💼 This rule is enabled in the ✅ `recommended` config.
+💼 This rule is enabled in the following configs: 🌐 `all`, ✅ `recommended`.
 
 <!-- end auto-generated rule header -->
 
 Enforce standard parameter names for Promise constructors
 
-#### Valid
+## Valid
 
 ```js
 new Promise(function (resolve) { ... })
@@ -16,7 +16,7 @@ new Promise(function (resolve, reject) { ... })
 new Promise(function (_resolve, _reject) { ... }) // Unused marker for parameters are allowed
 ```
 
-#### Invalid
+## Invalid
 
 ```js
 new Promise(function (reject, resolve) { ... }) // incorrect order
@@ -31,15 +31,15 @@ Promise constructor uses the
 Using the same parameter names as the language specification makes code more
 uniform and easier to understand.
 
-#### Options
+## Options
 
-##### `resolvePattern`
+### `resolvePattern`
 
 You can pass a `{ resolvePattern: "^_?resolve$" }` as an option to this rule to
 the first argument name pattern that the rule allows. Default is
 `"^_?resolve$"`.
 
-##### `rejectPattern`
+### `rejectPattern`
 
 You can pass a `{ rejectPattern: "^_?reject$" }` as an option to this rule to
 the second argument name pattern that the rule allows. Default is

@@ -2,6 +2,8 @@
 
 📝 Prefer `async`/`await` to the callback pattern.
 
+💼 This rule is enabled in the 🌐 `all` config.
+
 <!-- end auto-generated rule header -->
 
 `async`/`await` is a clearer pattern to follow than using callbacks.

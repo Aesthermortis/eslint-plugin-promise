@@ -2,14 +2,14 @@
 
 📝 Disallow wrapping values in `Promise.resolve` or `Promise.reject` when not needed.
 
-💼 This rule is enabled in the ✅ `recommended` config.
+💼 This rule is enabled in the following configs: 🌐 `all`, ✅ `recommended`.
 
 <!-- end auto-generated rule header -->
 
 Ensure that inside a `then()` or a `catch()` we always `return` or `throw` a raw
 value instead of wrapping in `Promise.resolve` or `Promise.reject`
 
-#### Valid
+## Valid
 
 ```js
 myPromise.then(function (val) {
@@ -20,7 +20,7 @@ myPromise.then(function (val) {
 });
 ```
 
-#### Invalid
+## Invalid
 
 ```js
 myPromise.then(function (val) {
@@ -31,9 +31,9 @@ myPromise.then(function (val) {
 });
 ```
 
-#### Options
+## Options
 
-##### `allowReject`
+### `allowReject`
 
 Pass `{ allowReject: true }` as an option to this rule to permit wrapping
 returned values with `Promise.reject`, such as when you would use it as another

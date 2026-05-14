@@ -2,7 +2,7 @@
 
 📝 Disallow calling `cb()` inside of a `then()` (use [util.callbackify][] instead).
 
-⚠️ This rule _warns_ in the ✅ `recommended` config.
+💼⚠️ This rule is enabled in the 🌐 `all` config. This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
@@ -27,7 +27,7 @@ Promise.resolve()
 
 If you run this example, your output will look like the following:
 
-```
+```txt
 Callback got called with: null data
 Callback got called with: My error null
 ```
@@ -61,7 +61,7 @@ Promise.resolve()
 
 Your output will now look like the following:
 
-```js
+```txt
 Callback got called with: null data
 ```
 

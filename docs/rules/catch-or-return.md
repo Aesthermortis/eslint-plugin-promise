@@ -2,14 +2,14 @@
 
 📝 Enforce the use of `catch()` on un-returned promises.
 
-💼 This rule is enabled in the ✅ `recommended` config.
+💼 This rule is enabled in the following configs: 🌐 `all`, ✅ `recommended`.
 
 <!-- end auto-generated rule header -->
 
 Ensure that each time a `then()` is applied to a promise, a `catch()` is applied
 as well. Exceptions are made if you are returning that promise.
 
-#### Valid
+## Valid
 
 ```js
 myPromise.then(doSomething).catch(errors);
@@ -19,7 +19,7 @@ function doSomethingElse() {
 }
 ```
 
-#### Invalid
+## Invalid
 
 ```js
 myPromise.then(doSomething);
@@ -29,9 +29,9 @@ function doSomethingElse() {
 }
 ```
 
-#### Options
+## Options
 
-##### `allowThen`
+### `allowThen`
 
 The second argument to `then()` can also be used to handle a promise rejection,
 but it won't catch any errors from the first argument callback. Because of this,
@@ -56,7 +56,7 @@ myPromise.then(null, handleErrors);
 myPromise.then(doSomething).catch(handleErrors);
 ```
 
-##### `allowThenStrict`
+### `allowThenStrict`
 
 `allowThenStrict` is similar to `allowThen` but it only permits `then` when the
 fulfillment handler is `null`. This option ensures that the final rejected
@@ -84,14 +84,14 @@ Examples of **incorrect** code for the `{ allowThenStrict: true }` option:
 myPromise.then(doSomething, handleErrors);
 ```
 
-##### `allowFinally`
+### `allowFinally`
 
 You can pass an `{ allowFinally: true }` as an option to this rule to allow for
 `.finally(fn)` to be used after `catch()` at the end of the promise chain. This
 is different from adding `'finally'` as a `terminationMethod` because it will
 still require the Promise chain to be "caught" beforehand.
 
-##### `terminationMethod`
+### `terminationMethod`
 
 You can pass a `{ terminationMethod: 'done' }` as an option to this rule to
 require `done()` instead of `catch()` at the end of the promise chain. This is

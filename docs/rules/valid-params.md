@@ -2,7 +2,7 @@
 
 📝 Enforces the proper number of arguments are passed to Promise functions.
 
-⚠️ This rule _warns_ in the ✅ `recommended` config.
+💼⚠️ This rule is enabled in the 🌐 `all` config. This rule _warns_ in the ✅ `recommended` config.
 
 <!-- end auto-generated rule header -->
 
