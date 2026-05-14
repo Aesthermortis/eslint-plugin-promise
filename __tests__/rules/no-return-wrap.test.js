@@ -1,5 +1,6 @@
-import rule from "../src/rules/no-return-wrap.js";
-import { RuleTester } from "./rule-tester.js";
+import rule from "../../src/rules/no-return-wrap.js";
+import { RuleTester } from "../rule-tester.js";
+
 const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 6,

@@ -1,9 +1,11 @@
-import rule from "../src/rules/no-native.js";
-import { RuleTester } from "./rule-tester.js";
+import rule from "../../src/rules/no-native.js";
+import { RuleTester } from "../rule-tester.js";
+
 const parserOptions = {
   ecmaVersion: 6,
   sourceType: "module",
 };
+
 const ruleTesters = [
   new RuleTester({
     parserOptions,

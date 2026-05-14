@@ -1,5 +1,6 @@
-import rule from "../src/rules/prefer-await-to-callbacks.js";
-import { RuleTester } from "./rule-tester.js";
+import rule from "../../src/rules/prefer-await-to-callbacks.js";
+import { RuleTester } from "../rule-tester.js";
+
 const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 8,

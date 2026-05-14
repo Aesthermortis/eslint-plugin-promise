@@ -1,5 +1,6 @@
-import rule from "../src/rules/no-new-statics.js";
-import { RuleTester } from "./rule-tester.js";
+import rule from "../../src/rules/no-new-statics.js";
+import { RuleTester } from "../rule-tester.js";
+
 const ruleTester = new RuleTester();
 
 ruleTester.run("no-new-statics", rule, {

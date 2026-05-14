@@ -2,6 +2,24 @@
 
 /** @type {import("jest").Config} */
 const config = {
+  // Auto-clear and restore spies/mocks between tests.
+  clearMocks: true,
+
+  // Collect coverage from source files, excluding test files.
+  collectCoverageFrom: [
+    "src/rules/*.js",
+    "src/rules/**/*.js",
+    "!src/rules/fix/**/*.js",
+    "!src/rules/lib/**/*.js",
+  ],
+
+  // Ignore coverage for node_modules and build output.
+  coveragePathIgnorePatterns: ["/node_modules/", "/dist/"],
+
+  // Use V8's built-in code coverage for faster and more accurate results.
+  coverageProvider: "v8",
+
+  // Enforce 100% coverage globally.
   coverageThreshold: {
     global: {
       branches: 100,
@@ -10,8 +28,26 @@ const config = {
       statements: 100,
     },
   },
-  collectCoverageFrom: ["src/rules/*.js", "src/rules/*/*.js"],
-  testPathIgnorePatterns: ["__tests__/rule-tester.js"],
+
+  // Automatically reset spies/mocks between tests.
+  resetMocks: true,
+
+  // Automatically restore spies/mocks to their original implementations.
+  restoreMocks: true,
+
+  // Look for modules under src/ when resolving imports.
+  roots: ["<rootDir>/src", "<rootDir>/__tests__"],
+
+  testEnvironment: "node",
+
+  // Discover *.test.* or *.spec.* files within the dedicated tests/ folder.
+  testMatch: ["<rootDir>/__tests__/**/*.{spec,test}.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"],
+
+  extensionsToTreatAsEsm: [],
+
+  moduleFileExtensions: ["js", "json"],
+
+  transform: {},
 };
 
 export default config;
