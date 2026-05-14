@@ -8,10 +8,16 @@ import { isCommaToken } from "@eslint-community/eslint-utils";
 import { getParentheses } from "../lib/parentheses.js";
 
 /**
+ * @typedef {import("eslint").Rule.Node & {
+ *   parent: { arguments: import("eslint").Rule.Node[] };
+ * }} RemovableArgument
+ */
+
+/**
  * Remove an argument from a call expression while preserving valid commas and spacing.
  *
  * @param {import("eslint").Rule.RuleFixer} fixer - The ESLint fixer instance.
- * @param {import("eslint").Rule.Node} node - The argument node to remove.
+ * @param {RemovableArgument} node - The argument node to remove.
  * @param {import("eslint").SourceCode} sourceCode - The source code instance.
  * @returns {import("eslint").Rule.Fix} The fix operation that removes the argument range.
  */
