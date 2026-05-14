@@ -66,9 +66,11 @@ const rule = {
           // The node is not in the callback function.
           return;
         }
-        if (node.callee.type !== "MemberExpression" || node.callee.property.type !== "Identifier") {
-          return;
-        }
+        const promiseCallee = /**
+                               * @type {import("estree").MemberExpression & {
+                               *   property: import("estree").Identifier;
+                               * }}
+                               */ (node.callee);
 
         // Checks if the argument callback uses variables defined in the closest callback function scope.
         //
@@ -122,7 +124,7 @@ const rule = {
         }
 
         context.report({
-          node: node.callee.property,
+          node: promiseCallee.property,
           messageId: "avoidNesting",
         });
       },
