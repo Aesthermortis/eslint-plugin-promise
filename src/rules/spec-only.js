@@ -3,6 +3,22 @@ import getDocsUrl from "./lib/get-docs-url.js";
 const PROMISE_INSTANCE_METHODS = new Set(["then", "catch", "finally"]);
 
 /**
+ * Get a supported property name from a member expression property.
+ *
+ * @param {import("estree").MemberExpression["property"]} property - Property node to inspect.
+ * @returns {string | undefined} Property name when it can be resolved.
+ */
+function getPropertyName(property) {
+  if (property.type === "Identifier") {
+    return property.name;
+  }
+
+  if (property.type === "Literal" && typeof property.value === "string") {
+    return property.value;
+  }
+}
+
+/**
  * Check whether a member expression property is allowed by the standard set or by user-configured extra methods.
  *
  * @param {import("eslint").Rule.Node} expression - The node to evaluate.
@@ -12,21 +28,26 @@ const PROMISE_INSTANCE_METHODS = new Set(["then", "catch", "finally"]);
  */
 function isPermittedProperty(expression, standardSet, allowedMethods) {
   // istanbul ignore if
-  if (expression.type !== "MemberExpression") return false;
+  if (expression.type !== "MemberExpression") {
+    return false;
+  }
 
-  if (expression.property.type === "Literal")
+  if (expression.property.type === "Literal") {
+    const propertyName = getPropertyName(expression.property);
     return (
-      standardSet.has(expression.property.value) ||
-      allowedMethods.includes(expression.property.value)
+      propertyName !== undefined &&
+      (standardSet.has(propertyName) || allowedMethods.includes(propertyName))
     );
+  }
 
   // istanbul ignore else
-  if (expression.property.type === "Identifier")
+  if (expression.property.type === "Identifier") {
     return (
       expression.computed ||
       standardSet.has(expression.property.name) ||
       allowedMethods.includes(expression.property.name)
     );
+  }
 
   // istanbul ignore next
   return false;
@@ -72,19 +93,21 @@ const rule = {
 
     return {
       MemberExpression(node) {
+        const propertyName = getPropertyName(node.property);
+        const parent = node.parent;
         if (
           node.object.type === "Identifier" &&
           node.object.name === "Promise" &&
-          ((node.property.name !== "prototype" &&
+          ((propertyName !== "prototype" &&
             !isPermittedProperty(node, PROMISE_STATICS, allowedMethods)) ||
-            (node.property.name === "prototype" &&
-              node.parent.type === "MemberExpression" &&
-              !isPermittedProperty(node.parent, PROMISE_INSTANCE_METHODS, allowedMethods)))
+            (propertyName === "prototype" &&
+              parent.type === "MemberExpression" &&
+              !isPermittedProperty(parent, PROMISE_INSTANCE_METHODS, allowedMethods)))
         ) {
           context.report({
             node,
             messageId: "avoidNonStandard",
-            data: { name: node.property.name ?? node.property.value },
+            data: { name: propertyName ?? "unknown" },
           });
         }
       },
