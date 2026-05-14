@@ -20,6 +20,7 @@ import { isPromiseConstructorWithInlineExecutor } from "./lib/is-promise-constru
  * @typedef {import("eslint").Rule.CodePathSegment} CodePathSegment
  * @typedef {import("eslint").Rule.RuleContext} RuleContext
  * @typedef {import("eslint").Scope.Scope} Scope
+ * @typedef {Node & { parent?: Node }} NodeWithParent
  */
 
 /**
@@ -46,6 +47,16 @@ import { isPromiseConstructorWithInlineExecutor } from "./lib/is-promise-constru
  */
 function getFunctionScope(context, node) {
   return context.sourceCode.scopeManager.acquire(node);
+}
+
+/**
+ * Gets the parent node added by ESLint during traversal.
+ *
+ * @param {Node} node - Node whose parent should be read.
+ * @returns {Node | undefined} Parent node when ESLint has attached it.
+ */
+function getParent(node) {
+  return /** @type {NodeWithParent} */ (node).parent;
 }
 
 /**
@@ -539,8 +550,9 @@ const rule = {
         return;
       }
       reported.add(node);
+      const parent = getParent(node);
       context.report({
-        node: node.parent,
+        node: parent ?? node,
         messageId: kind === "certain" ? "alreadyResolved" : "potentiallyAlreadyResolved",
         data: {
           line: resolved.loc.start.line,
@@ -596,7 +608,8 @@ const rule = {
        * @returns {void}
        */
       "FunctionExpression, ArrowFunctionExpression"(node) {
-        if (!isPromiseConstructorWithInlineExecutor(node.parent)) {
+        const parent = getParent(node);
+        if (!parent || !isPromiseConstructorWithInlineExecutor(parent)) {
           return;
         }
         /** @type {Set<Identifier>} */
@@ -614,9 +627,13 @@ const rule = {
         for (const resolver of resolvers) {
           const variable = functionScope.set.get(resolver.name);
           // istanbul ignore next -- Usually always present.
-          if (!variable) continue;
+          if (!variable) {
+            continue;
+          }
           for (const reference of variable.references) {
-            resolverReferences.add(reference.identifier);
+            if (reference.identifier.type === "Identifier") {
+              resolverReferences.add(reference.identifier);
+            }
           }
         }
 
@@ -631,7 +648,8 @@ const rule = {
        * @returns {void}
        */
       "FunctionExpression, ArrowFunctionExpression:exit"(node) {
-        if (!isPromiseConstructorWithInlineExecutor(node.parent)) {
+        const parent = getParent(node);
+        if (!parent || !isPromiseConstructorWithInlineExecutor(parent)) {
           return;
         }
         resolverReferencesStack.shift();
@@ -708,17 +726,14 @@ const rule = {
        * @returns {void}
        */
       onCodePathSegmentEnd(segment, node) {
+        const parent = getParent(node);
         if (
           node.type === "CatchClause" &&
           lastThrowableExpression &&
-          node.parent.type === "TryStatement" &&
-          node.parent.range[0] <= lastThrowableExpression.range[0] &&
-          lastThrowableExpression.range[1] <= node.parent.range[1] &&
-          isExpressionInsideResolverCall(
-            lastThrowableExpression,
-            resolverCallsStack[0],
-            node.parent,
-          )
+          parent?.type === "TryStatement" &&
+          parent.range[0] <= lastThrowableExpression.range[0] &&
+          lastThrowableExpression.range[1] <= parent.range[1] &&
+          isExpressionInsideResolverCall(lastThrowableExpression, resolverCallsStack[0], parent)
         ) {
           promiseCodePathContext.addResolvedTryBlockCodePathSegment(segment);
         }
