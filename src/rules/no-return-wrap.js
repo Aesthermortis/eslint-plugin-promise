@@ -34,8 +34,10 @@ function isInPromise(context, node) {
   return functionNode && functionNode.parent && isPromise(functionNode.parent);
 }
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -65,6 +67,7 @@ export default {
       },
     ],
   },
+
   create(context) {
     const [{ allowReject }] = context.options;
 
@@ -101,3 +104,5 @@ export default {
     };
   },
 };
+
+export default rule;

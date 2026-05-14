@@ -32,8 +32,10 @@ function isPermittedProperty(expression, standardSet, allowedMethods) {
   return false;
 }
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "problem",
     docs: {
@@ -64,6 +66,7 @@ export default {
       avoidNonStandard: "Avoid using non-standard 'Promise.{{ name }}'",
     },
   },
+
   create(context) {
     const [{ allowedMethods }] = context.options;
 
@@ -88,3 +91,5 @@ export default {
     };
   },
 };
+
+export default rule;

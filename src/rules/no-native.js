@@ -26,8 +26,10 @@ function isDeclared(scope, reference) {
   });
 }
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -40,6 +42,7 @@ export default {
     },
     schema: [],
   },
+
   create(context) {
     return {
       "Program:exit"() {
@@ -79,3 +82,5 @@ export default {
     };
   },
 };
+
+export default rule;

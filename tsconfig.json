@@ -11,6 +11,13 @@
     "target": "es2024",
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*.js", "__tests__/**/*.js", "*.config.js", "index.d.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "*.config.js",
+    "src/**/*.js",
+    "src/**/*.d.ts",
+    "types/**/*.d.ts",
+    "__tests__/**/*.js",
+    "index.d.ts"
+  ],
+  "exclude": ["node_modules", "coverage", "dist", ".cache"]
 }

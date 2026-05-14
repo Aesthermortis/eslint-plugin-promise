@@ -170,8 +170,10 @@ function isIgnoredAssignment(node, ignoredVars) {
   return ignoredVars.includes(rootName);
 }
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "problem",
     docs: {
@@ -211,6 +213,7 @@ export default {
       thenShouldReturnOrThrow: "Each then() should return a value or throw",
     },
   },
+
   create(context) {
     const [{ ignoreAssignmentVariable, ignoreLastCallback }] = context.options;
 
@@ -335,3 +338,5 @@ export default {
     };
   },
 };
+
+export default rule;

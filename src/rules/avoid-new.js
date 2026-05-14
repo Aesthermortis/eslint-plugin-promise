@@ -5,8 +5,10 @@
 
 import getDocsUrl from "./lib/get-docs-url.js";
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -19,6 +21,7 @@ export default {
       avoidNew: "Avoid creating new promises.",
     },
   },
+
   create(context) {
     return {
       NewExpression(node) {
@@ -29,3 +32,5 @@ export default {
     };
   },
 };
+
+export default rule;

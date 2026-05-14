@@ -7,8 +7,10 @@ import getDocsUrl from "./lib/get-docs-url.js";
 import isPromise from "./lib/is-promise.js";
 import isInsideCallback from "./lib/is-inside-callback.js";
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -36,6 +38,7 @@ export default {
       avoidPromiseInCallback: "Avoid using promises inside of callbacks.",
     },
   },
+
   create(context) {
     const [{ exemptDeclarations }] = context.options;
 
@@ -64,3 +67,5 @@ export default {
     };
   },
 };
+
+export default rule;

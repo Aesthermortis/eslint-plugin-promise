@@ -1,8 +1,10 @@
 import getDocsUrl from "./lib/get-docs-url.js";
 import isPromise from "./lib/is-promise.js";
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "problem",
     docs: {
@@ -14,6 +16,7 @@ export default {
       avoidReturnInFinally: "No return in finally",
     },
   },
+
   create(context) {
     return {
       CallExpression(node) {
@@ -39,3 +42,5 @@ export default {
     };
   },
 };
+
+export default rule;

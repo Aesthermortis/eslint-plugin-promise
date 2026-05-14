@@ -12,8 +12,10 @@ function compilePattern(pattern) {
   return new RegExp(pattern, "u");
 }
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -49,6 +51,7 @@ export default {
         'Promise constructor parameters must be named to match "{{ rejectPattern }}"',
     },
   },
+
   create(context) {
     const [{ rejectPattern: rejectPatternSource, resolvePattern: resolvePatternSource }] =
       context.options;
@@ -89,3 +92,5 @@ export default {
     };
   },
 };
+
+export default rule;

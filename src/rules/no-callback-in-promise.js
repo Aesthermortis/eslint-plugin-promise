@@ -26,8 +26,10 @@ const isInsideTimeout = (node) => {
   return isInCB;
 };
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -64,6 +66,7 @@ export default {
       },
     ],
   },
+
   create(context) {
     const [{ exceptions, timeoutsErr }] = context.options;
 
@@ -108,3 +111,5 @@ export default {
     };
   },
 };
+
+export default rule;

@@ -72,8 +72,10 @@ function hasErrorFirstParameter(callbackArg) {
   return ERROR_NAMES.has(firstParam?.name);
 }
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -85,6 +87,7 @@ export default {
     },
     schema: [],
   },
+
   create(context) {
     /**
      * Reports function declarations or expressions that expose callback-style final parameters.
@@ -138,3 +141,5 @@ export default {
     };
   },
 };
+
+export default rule;

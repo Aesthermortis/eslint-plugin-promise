@@ -1,8 +1,10 @@
 import PROMISE_STATICS from "./lib/promise-statics.js";
 import getDocsUrl from "./lib/get-docs-url.js";
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "problem",
     docs: {
@@ -15,6 +17,7 @@ export default {
       avoidNewStatic: "Avoid calling 'new' on 'Promise.{{ name }}()'",
     },
   },
+
   create(context) {
     return {
       NewExpression(node) {
@@ -36,3 +39,5 @@ export default {
     };
   },
 };
+
+export default rule;

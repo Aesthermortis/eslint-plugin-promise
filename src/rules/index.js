@@ -16,7 +16,9 @@ import preferCatch from "./prefer-catch.js";
 import specOnly from "./spec-only.js";
 import validParams from "./valid-params.js";
 
-/** @type {Record<string, import("eslint").Rule.RuleModule>} */
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {Record<string, PromiseRuleModule>} */
 const rules = {
   "always-return": alwaysReturn,
   "avoid-new": avoidNew,

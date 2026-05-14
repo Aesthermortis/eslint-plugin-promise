@@ -1,4 +1,4 @@
-/** @type {import("eslint").Linter.RulesRecord} */
+/** @satisfies {import("eslint").Linter.RulesRecord} */
 const recommendedRules = {
   "promise/always-return": "error",
   "promise/no-return-wrap": "error",

@@ -22,8 +22,10 @@ function* iterateDefinedReferences(scope) {
   }
 }
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -35,6 +37,7 @@ export default {
       avoidNesting: "Avoid nesting promises.",
     },
   },
+
   create(context) {
     /**
      * Array of callback function scopes.
@@ -121,3 +124,5 @@ export default {
     };
   },
 };
+
+export default rule;

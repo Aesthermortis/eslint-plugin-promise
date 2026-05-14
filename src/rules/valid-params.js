@@ -1,8 +1,10 @@
 import getDocsUrl from "./lib/get-docs-url.js";
 import isPromise from "./lib/is-promise.js";
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "problem",
     docs: {
@@ -37,6 +39,7 @@ export default {
         "Promise.{{ name }}() requires 1 or 2 arguments, but received {{ numArgs }}",
     },
   },
+
   create(context) {
     const [{ exclude }] = context.options;
     return {
@@ -98,3 +101,5 @@ export default {
     };
   },
 };
+
+export default rule;

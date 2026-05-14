@@ -8,8 +8,10 @@ import getDocsUrl from "./lib/get-docs-url.js";
 import isPromise from "./lib/is-promise.js";
 import isMemberCallWithObjectName from "./lib/is-member-call-with-object-name.js";
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "problem",
     docs: {
@@ -61,6 +63,7 @@ export default {
       },
     ],
   },
+
   create(context) {
     const [
       { allowFinally, allowThen, allowThenStrict, terminationMethod: configuredTerminationMethod },
@@ -150,3 +153,5 @@ export default {
     };
   },
 };
+
+export default rule;

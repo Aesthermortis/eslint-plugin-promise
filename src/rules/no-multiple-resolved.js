@@ -497,8 +497,10 @@ class PromiseCodePathContext {
   }
 }
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "problem",
     docs: {
@@ -736,3 +738,5 @@ export default {
     };
   },
 };
+
+export default rule;

@@ -6,8 +6,10 @@
 import getDocsUrl from "./lib/get-docs-url.js";
 import removeArgument from "./fix/remove-argument.js";
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -20,6 +22,7 @@ export default {
       preferCatchToThen: "Prefer `catch` to `then(a, b)`/`then(null, b)`.",
     },
   },
+
   create(context) {
     const sourceCode = context.sourceCode;
     return {
@@ -49,3 +52,5 @@ export default {
     };
   },
 };
+
+export default rule;

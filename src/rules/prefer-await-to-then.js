@@ -6,8 +6,10 @@
 import getDocsUrl from "./lib/get-docs-url.js";
 import isMemberCallWithObjectName from "./lib/is-member-call-with-object-name.js";
 
-/** @type {import("eslint").Rule.RuleModule} */
-export default {
+/** @import {PromiseRuleModule} from "../types.d.ts" */
+
+/** @type {PromiseRuleModule} */
+const rule = {
   meta: {
     type: "suggestion",
     docs: {
@@ -36,6 +38,7 @@ export default {
       preferAwaitToCallback: "Prefer await to then()/catch()/finally().",
     },
   },
+
   create(context) {
     /**
      * Check whether a node is inside an await or yield expression.
@@ -100,3 +103,5 @@ export default {
     };
   },
 };
+
+export default rule;
