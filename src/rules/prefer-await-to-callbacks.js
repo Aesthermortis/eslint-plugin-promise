@@ -3,10 +3,12 @@ import getDocsUrl from "./lib/get-docs-url.js";
 /**
  * @typedef {import("estree").Node} Node
  * @typedef {import("estree").CallExpression} CallExpression
+ * @typedef {import("estree").Expression | import("estree").SpreadElement} CallArgument
  * @typedef {import("estree").FunctionDeclaration} FunctionDeclaration
  * @typedef {import("estree").FunctionExpression} FunctionExpression
  * @typedef {import("estree").ArrowFunctionExpression} ArrowFunctionExpression
  * @typedef {FunctionDeclaration | FunctionExpression | ArrowFunctionExpression} FunctionWithParams
+ * @typedef {FunctionExpression | ArrowFunctionExpression} CallbackFunction
  */
 
 const ARRAY_METHODS = new Set(["map", "every", "forEach", "some", "find", "filter"]);
@@ -16,8 +18,8 @@ const ERROR_NAMES = new Set(["err", "error"]);
 /**
  * Checks whether a node is a function expression usable as a callback argument.
  *
- * @param {Node | undefined} node - Node to check.
- * @returns {boolean} Whether the node is a function expression or arrow function expression.
+ * @param {CallArgument | undefined} node - Node to check.
+ * @returns {node is CallbackFunction} Whether the node is a function expression or arrow function expression.
  */
 function isFunctionNode(node) {
   return node?.type === "FunctionExpression" || node?.type === "ArrowFunctionExpression";
@@ -27,7 +29,7 @@ function isFunctionNode(node) {
  * Gets the final argument from a call expression.
  *
  * @param {CallExpression} node - Call expression to inspect.
- * @returns {Node | undefined} Last call argument, if present.
+ * @returns {CallArgument | undefined} Last call argument, if present.
  */
 function getLastArgument(node) {
   return node.arguments.at(-1);
@@ -40,7 +42,10 @@ function getLastArgument(node) {
  * @returns {boolean} Whether the call is an `on` or `once` listener registration.
  */
 function isEventListenerCallback(node) {
-  return node.callee.property?.name === "on" || node.callee.property?.name === "once";
+  if (node.callee.type !== "MemberExpression" || node.callee.property.type !== "Identifier") {
+    return false;
+  }
+  return node.callee.property.name === "on" || node.callee.property.name === "once";
 }
 
 /**
@@ -50,26 +55,32 @@ function isEventListenerCallback(node) {
  * @returns {boolean} Whether the call is an array, lodash, underscore, or imported array helper call.
  */
 function isArrayMethodCallback(node) {
+  if (node.callee.type === "MemberExpression") {
+    const objectName = node.callee.object.type === "Identifier" ? node.callee.object.name : "";
+    const propertyName =
+      node.callee.property.type === "Identifier" ? node.callee.property.name : "";
+    const isLodash = ["lodash", "underscore", "_"].includes(objectName);
+    return (
+      ARRAY_METHODS.has(propertyName) &&
+      (node.arguments.length === 1 || (node.arguments.length === 2 && isLodash))
+    );
+  }
+
+  const calleeName = node.callee.type === "Identifier" ? node.callee.name : "";
   const isLodash =
-    node.callee.object && ["lodash", "underscore", "_"].includes(node.callee.object.name);
-  const callsArrayMethod =
-    node.callee.property &&
-    ARRAY_METHODS.has(node.callee.property.name) &&
-    (node.arguments.length === 1 || (node.arguments.length === 2 && isLodash));
-  const isArrayMethod =
-    node.callee.name && ARRAY_METHODS.has(node.callee.name) && node.arguments.length === 2;
-  return callsArrayMethod || isArrayMethod;
+    node.callee.type === "Identifier" && ["lodash", "underscore", "_"].includes(calleeName);
+  return !isLodash && ARRAY_METHODS.has(calleeName) && node.arguments.length === 2;
 }
 
 /**
  * Checks whether a callback function uses an error-first parameter name.
  *
- * @param {Node | undefined} callbackArg - Callback argument to inspect.
+ * @param {CallbackFunction} callbackArg - Callback argument to inspect.
  * @returns {boolean} Whether the first callback parameter is named `err` or `error`.
  */
 function hasErrorFirstParameter(callbackArg) {
-  const firstParam = callbackArg?.params?.[0];
-  return ERROR_NAMES.has(firstParam?.name);
+  const firstParam = callbackArg.params[0];
+  return firstParam?.type === "Identifier" && ERROR_NAMES.has(firstParam.name);
 }
 
 /** @import {PromiseRuleModule} from "../types.d.ts" */
@@ -96,8 +107,8 @@ const rule = {
      * @returns {void}
      */
     function checkLastParamsForCallback(node) {
-      const lastParam = node.params.at(-1) || {};
-      if (lastParam.name === "callback" || lastParam.name === "cb") {
+      const lastParam = node.params.at(-1);
+      if (lastParam?.type === "Identifier" && CALLBACK_NAMES.has(lastParam.name)) {
         context.report({ node: lastParam, messageId: "error" });
       }
     }
@@ -116,7 +127,7 @@ const rule = {
     return {
       CallExpression(node) {
         // Callbacks aren't allowed.
-        if (CALLBACK_NAMES.has(node.callee.name)) {
+        if (node.callee.type === "Identifier" && CALLBACK_NAMES.has(node.callee.name)) {
           context.report({ node, messageId: "error" });
           return;
         }
