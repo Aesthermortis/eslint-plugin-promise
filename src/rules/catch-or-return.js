@@ -9,6 +9,31 @@ import isPromise from "./lib/is-promise.js";
 import isMemberCallWithObjectName from "./lib/is-member-call-with-object-name.js";
 
 /** @import {PromiseRuleModule} from "../types.d.ts" */
+/**
+ * @typedef {import("estree").Expression} Expression
+ * @typedef {import("estree").MemberExpression} MemberExpression
+ */
+
+/**
+ * Checks whether a member expression has an identifier property.
+ *
+ * @param {MemberExpression} expression - Member expression to inspect.
+ * @returns {expression is MemberExpression & { property: import("estree").Identifier }} Whether the property is an
+ *                                                                                       identifier.
+ */
+function hasIdentifierProperty(expression) {
+  return expression.property.type === "Identifier";
+}
+
+/**
+ * Checks whether an expression belongs to a promise chain.
+ *
+ * @param {Expression} expression - Expression to inspect.
+ * @returns {boolean} Whether the expression is recognized as promise-related.
+ */
+function isPromiseExpression(expression) {
+  return isPromise(/** @type {import("eslint").Rule.Node} */ (/** @type {unknown} */ (expression)));
+}
 
 /** @type {PromiseRuleModule} */
 const rule = {
@@ -77,7 +102,7 @@ const rule = {
     /**
      * Checks whether an expression satisfies the configured promise termination contract.
      *
-     * @param {import("eslint").Rule.Node} expression - Expression node to inspect.
+     * @param {Expression} expression - Expression node to inspect.
      * @returns {boolean} Whether the expression is an allowed promise termination.
      */
     function isAllowedPromiseTermination(expression) {
@@ -86,6 +111,7 @@ const rule = {
         (allowThen || allowThenStrict) &&
         expression.type === "CallExpression" &&
         expression.callee.type === "MemberExpression" &&
+        hasIdentifierProperty(expression.callee) &&
         expression.callee.property.name === "then" &&
         expression.arguments.length === 2 &&
         // somePromise.then(null, b)
@@ -100,8 +126,10 @@ const rule = {
         allowFinally &&
         expression.type === "CallExpression" &&
         expression.callee.type === "MemberExpression" &&
+        hasIdentifierProperty(expression.callee) &&
         expression.callee.property.name === "finally" &&
-        isPromise(expression.callee.object) &&
+        expression.callee.object.type !== "Super" &&
+        isPromiseExpression(expression.callee.object) &&
         isAllowedPromiseTermination(expression.callee.object)
       ) {
         return true;
@@ -111,6 +139,7 @@ const rule = {
       if (
         expression.type === "CallExpression" &&
         expression.callee.type === "MemberExpression" &&
+        hasIdentifierProperty(expression.callee) &&
         terminationMethod.includes(expression.callee.property.name)
       ) {
         return true;
@@ -136,7 +165,7 @@ const rule = {
 
     return {
       ExpressionStatement(node) {
-        if (!isPromise(node.expression)) {
+        if (!isPromiseExpression(node.expression)) {
           return;
         }
 
