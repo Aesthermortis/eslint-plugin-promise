@@ -44,18 +44,25 @@ const rule = {
 
     return {
       CallExpression(node) {
-        if (!isPromise(node)) return;
+        if (!isPromise(node)) {
+          return;
+        }
 
         // if i'm returning the promise, it's probably not really a callback
         // function, and I should be okay....
-        if (node.parent.type === "ReturnStatement") return;
+        if (node.parent.type === "ReturnStatement") {
+          return;
+        }
 
         // what about if the parent is an ArrowFunctionExpression
         // would that imply an implicit return?
 
         if (
           context.sourceCode.getAncestors(node).some((ancestor) => {
-            return isInsideCallback(ancestor, exemptDeclarations);
+            return isInsideCallback(
+              /** @type {import("eslint").Rule.Node} */ (/** @type {unknown} */ (ancestor)),
+              exemptDeclarations,
+            );
           })
         ) {
           context.report({
