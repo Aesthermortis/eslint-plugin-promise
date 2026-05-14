@@ -47,6 +47,9 @@ const rule = {
         if (!isPromise(node)) {
           return;
         }
+        if (node.callee.type !== "MemberExpression" || node.callee.property.type !== "Identifier") {
+          return;
+        }
 
         const name = node.callee.property.name;
         const numArgs = node.arguments.length;
