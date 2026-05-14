@@ -67,7 +67,7 @@ const rule = {
             return;
           }
 
-          const resolveParamName = params[0] && params[0].name;
+          const resolveParamName = params[0]?.type === "Identifier" ? params[0].name : undefined;
           if (resolveParamName && !resolvePattern.test(resolveParamName)) {
             context.report({
               node: params[0],
@@ -77,7 +77,7 @@ const rule = {
               },
             });
           }
-          const rejectParamName = params[1] && params[1].name;
+          const rejectParamName = params[1]?.type === "Identifier" ? params[1].name : undefined;
           if (rejectParamName && !rejectPattern.test(rejectParamName)) {
             context.report({
               node: params[1],
