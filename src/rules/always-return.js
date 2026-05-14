@@ -129,8 +129,7 @@ function isLastCallback(node) {
     }
     return false;
   }
-
-  // istanbul ignore next
+  /* c8 ignore next 3 -- ESLint traversal provides a parent chain for inline then callbacks. */
   return false;
 }
 
