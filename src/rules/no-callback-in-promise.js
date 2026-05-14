@@ -15,15 +15,47 @@ const TIMEOUT_WHITELIST = new Set([
   "nextTick",
 ]);
 
+/**
+ * Gets an identifier name from a node.
+ *
+ * @param {import("estree").Node | undefined} node Node to inspect.
+ * @returns {string | undefined} Identifier name when present.
+ */
+function getIdentifierName(node) {
+  return node?.type === "Identifier" ? node.name : undefined;
+}
+
+/**
+ * Gets the called function or member name.
+ *
+ * @param {import("estree").Expression | import("estree").Super | undefined} callee Callee to inspect.
+ * @returns {string | undefined} Call name when it can be resolved.
+ */
+function getCallName(callee) {
+  if (callee?.type === "Identifier") {
+    return callee.name;
+  }
+
+  if (callee?.type === "MemberExpression" && callee.property.type === "Identifier") {
+    return callee.property.name;
+  }
+}
+
+/**
+ * Checks whether a function expression is passed to a timeout-like call.
+ *
+ * @param {import("eslint").Rule.Node} node Node to inspect.
+ * @returns {boolean} Whether the node is inside a timeout-like call.
+ */
 const isInsideTimeout = (node) => {
   const isFunctionExpression =
     node.type === "FunctionExpression" || node.type === "ArrowFunctionExpression";
-  const parent = node.parent || {};
-  const callee = parent.callee || {};
-  const name = (callee.property && callee.property.name) || callee.name || "";
-  const parentIsTimeout = TIMEOUT_WHITELIST.has(name);
-  const isInCB = isFunctionExpression && parentIsTimeout;
-  return isInCB;
+  if (!isFunctionExpression || !node.parent || node.parent.type !== "CallExpression") {
+    return false;
+  }
+
+  const name = getCallName(node.parent.callee);
+  return name !== undefined && TIMEOUT_WHITELIST.has(name);
 };
 
 /** @import {PromiseRuleModule} from "../types.d.ts" */
@@ -73,13 +105,14 @@ const rule = {
     return {
       CallExpression(node) {
         if (!isCallback(node, exceptions)) {
-          const name = node.arguments?.[0]?.name;
+          const name = getIdentifierName(node.arguments[0]);
           if (hasPromiseCallback(node)) {
-            const callingName = node.callee.name || node.callee.property?.name;
+            const callingName = getCallName(node.callee);
             if (
+              name !== undefined &&
               !exceptions.includes(name) &&
               CB_BLACKLIST.has(name) &&
-              (timeoutsErr || !TIMEOUT_WHITELIST.has(callingName))
+              (timeoutsErr || callingName === undefined || !TIMEOUT_WHITELIST.has(callingName))
             ) {
               context.report({
                 node: node.arguments[0],
@@ -99,8 +132,16 @@ const rule = {
         }
 
         const ancestors = context.sourceCode.getAncestors(node);
-        const insidePromise = ancestors.some((ancestor) => isInsidePromise(ancestor));
-        const insideTimeout = ancestors.some((ancestor) => isInsideTimeout(ancestor));
+        const insidePromise = ancestors.some((ancestor) => {
+          return isInsidePromise(
+            /** @type {import("eslint").Rule.Node} */ (/** @type {unknown} */ (ancestor)),
+          );
+        });
+        const insideTimeout = ancestors.some((ancestor) => {
+          return isInsideTimeout(
+            /** @type {import("eslint").Rule.Node} */ (/** @type {unknown} */ (ancestor)),
+          );
+        });
         if (insidePromise && (timeoutsErr || !insideTimeout)) {
           context.report({
             node,
