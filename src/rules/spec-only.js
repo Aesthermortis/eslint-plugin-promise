@@ -21,17 +21,12 @@ function getPropertyName(property) {
 /**
  * Check whether a member expression property is allowed by the standard set or by user-configured extra methods.
  *
- * @param {import("eslint").Rule.Node} expression - The node to evaluate.
+ * @param {import("estree").MemberExpression} expression - The node to evaluate.
  * @param {Set<string>} standardSet - The set of standard Promise method names.
  * @param {string[]} allowedMethods - Extra method names allowed by configuration.
  * @returns {boolean} Whether the property access is permitted.
  */
 function isPermittedProperty(expression, standardSet, allowedMethods) {
-  // istanbul ignore if
-  if (expression.type !== "MemberExpression") {
-    return false;
-  }
-
   if (expression.property.type === "Literal") {
     const propertyName = getPropertyName(expression.property);
     return (
@@ -48,8 +43,7 @@ function isPermittedProperty(expression, standardSet, allowedMethods) {
       allowedMethods.includes(expression.property.name)
     );
   }
-
-  // istanbul ignore next
+  /* c8 ignore next -- PrivateIdentifier properties are not standard Promise APIs. */
   return false;
 }
 

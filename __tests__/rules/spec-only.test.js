@@ -74,5 +74,9 @@ ruleTester.run("spec-only", rule, {
       code: `Promise["done"];`,
       errors: [{ message: "Avoid using non-standard 'Promise.done'" }],
     },
+    {
+      code: `Promise[1];`,
+      errors: [{ message: "Avoid using non-standard 'Promise.unknown'" }],
+    },
   ],
 });
