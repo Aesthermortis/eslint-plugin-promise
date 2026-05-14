@@ -25,7 +25,7 @@ const rule = {
   create(context) {
     return {
       NewExpression(node) {
-        if (node.callee.name === "Promise") {
+        if (node.callee.type === "Identifier" && node.callee.name === "Promise") {
           context.report({ node, messageId: "avoidNew" });
         }
       },
