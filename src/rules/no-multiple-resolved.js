@@ -552,6 +552,7 @@ const rule = {
       reported.add(node);
       const parent = getParent(node);
       context.report({
+        /* c8 ignore next -- Resolver identifiers reported by ESLint traversal have parent nodes. */
         node: parent ?? node,
         messageId: kind === "certain" ? "alreadyResolved" : "potentiallyAlreadyResolved",
         data: {
@@ -626,7 +627,7 @@ const rule = {
         const functionScope = getFunctionScope(context, node);
         for (const resolver of resolvers) {
           const variable = functionScope.set.get(resolver.name);
-          // istanbul ignore next -- Usually always present.
+          /* c8 ignore next 3 -- ESLint scope references include variables for function params. */
           if (!variable) {
             continue;
           }
