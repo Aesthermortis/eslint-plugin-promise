@@ -5,14 +5,22 @@
  * @returns {boolean} Whether the node is inside a Promise `then`/`catch` callback.
  */
 function isInsidePromise(node) {
-  const isFunctionExpression =
-    node.type === "FunctionExpression" || node.type === "ArrowFunctionExpression";
-  const parent = node.parent || {};
-  const callee = parent.callee || {};
-  const name = (callee.property && callee.property.name) || "";
-  const parentIsPromise = name === "then" || name === "catch";
-  const isInCB = isFunctionExpression && parentIsPromise;
-  return isInCB;
+  if (node.type !== "FunctionExpression" && node.type !== "ArrowFunctionExpression") {
+    return false;
+  }
+
+  const parent = node.parent;
+  if (
+    !parent ||
+    parent.type !== "CallExpression" ||
+    parent.callee.type !== "MemberExpression" ||
+    parent.callee.property.type !== "Identifier"
+  ) {
+    return false;
+  }
+
+  const name = parent.callee.property.name;
+  return name === "then" || name === "catch";
 }
 
 export default isInsidePromise;
