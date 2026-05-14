@@ -23,13 +23,16 @@ const rule = {
       NewExpression(node) {
         if (
           node.callee.type === "MemberExpression" &&
+          node.callee.object.type === "Identifier" &&
           node.callee.object.name === "Promise" &&
+          node.callee.property.type === "Identifier" &&
           PROMISE_STATICS.has(node.callee.property.name)
         ) {
+          const name = node.callee.property.name;
           context.report({
             node,
             messageId: "avoidNewStatic",
-            data: { name: node.callee.property.name },
+            data: { name },
             fix(fixer) {
               return fixer.replaceTextRange([node.range[0], node.range[0] + "new ".length], "");
             },
