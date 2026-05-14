@@ -59,9 +59,14 @@ const rule = {
         }
       },
       CallExpression(node) {
-        if (!hasPromiseCallback(node)) return;
+        if (!hasPromiseCallback(node)) {
+          return;
+        }
         if (callbackScopes.length === 0) {
           // The node is not in the callback function.
+          return;
+        }
+        if (node.callee.type !== "MemberExpression" || node.callee.property.type !== "Identifier") {
           return;
         }
 
