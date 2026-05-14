@@ -6,9 +6,14 @@ import getDocsUrl from "./lib/get-docs-url.js";
  * @typedef {import("estree").ArrowFunctionExpression} ArrowFunctionExpression
  * @typedef {import("eslint").Rule.CodePath} CodePath
  * @typedef {import("eslint").Rule.CodePathSegment} CodePathSegment
+ * @typedef {Node & { parent?: NodeWithParent | null }} NodeWithParent
  */
 
-/** @typedef {(FunctionExpression | ArrowFunctionExpression) & { parent: CallExpression }} InlineThenFunctionExpression */
+/**
+ * @typedef {(FunctionExpression | ArrowFunctionExpression) & {
+ *   parent: CallExpression & NodeWithParent;
+ * }} InlineThenFunctionExpression
+ */
 
 /**
  * @param {Node} node Node to check.
@@ -26,12 +31,12 @@ function isFunctionWithBlockStatement(node) {
 
 /**
  * @param {string} memberName Member name to match.
- * @param {Node} node Node to check.
+ * @param {Node | null | undefined} node Node to check.
  * @returns {node is CallExpression} Whether the node is a call to the member.
  */
 function isMemberCall(memberName, node) {
   return (
-    node.type === "CallExpression" &&
+    node?.type === "CallExpression" &&
     node.callee.type === "MemberExpression" &&
     !node.callee.computed &&
     node.callee.property.type === "Identifier" &&
@@ -40,15 +45,15 @@ function isMemberCall(memberName, node) {
 }
 
 /**
- * @param {Node} node Node to check.
+ * @param {NodeWithParent} node Node to check.
  * @returns {boolean} Whether the node is the first argument of its parent call.
  */
 function isFirstArgument(node) {
-  return Boolean(node.parent && node.parent.arguments && node.parent.arguments[0] === node);
+  return node.parent?.type === "CallExpression" && node.parent.arguments[0] === node;
 }
 
 /**
- * @param {Node} node Node to check.
+ * @param {NodeWithParent} node Node to check.
  * @returns {node is InlineThenFunctionExpression} Whether the node is the first inline `then()` callback.
  */
 function isInlineThenFunctionExpression(node) {
@@ -60,9 +65,9 @@ function isInlineThenFunctionExpression(node) {
 /**
  * Gets the next node to inspect while walking a promise chain.
  *
- * @param {Node} parent Parent node currently wrapping the target.
- * @param {Node} target Node currently being inspected.
- * @returns {Node | null} Next node to inspect, or `null` when the chain ends.
+ * @param {NodeWithParent} parent Parent node currently wrapping the target.
+ * @param {NodeWithParent} target Node currently being inspected.
+ * @returns {NodeWithParent | null} Next node to inspect, or `null` when the chain ends.
  */
 function getNextPromiseTarget(parent, target) {
   switch (parent.type) {
@@ -79,7 +84,7 @@ function getNextPromiseTarget(parent, target) {
     }
     case "MemberExpression": {
       if (
-        parent.parent &&
+        parent.parent?.type === "CallExpression" &&
         (isMemberCall("catch", parent.parent) || isMemberCall("finally", parent.parent))
       ) {
         // e.g. promise.then(() => value).catch(e => {})
@@ -100,9 +105,9 @@ function getNextPromiseTarget(parent, target) {
  * @returns {boolean} Whether the callback is the last relevant callback in the chain.
  */
 function isLastCallback(node) {
-  /** @type {Node} */
+  /** @type {NodeWithParent} */
   let target = node.parent;
-  /** @type {Node | undefined} */
+  /** @type {NodeWithParent | null | undefined} */
   let parent = target.parent;
   while (parent) {
     if (parent.type === "ExpressionStatement") {
