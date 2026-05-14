@@ -8,30 +8,53 @@ import getDocsUrl from "./lib/get-docs-url.js";
 import isPromise from "./lib/is-promise.js";
 
 /**
+ * @typedef {import("estree").Node} Node
+ * @typedef {import("estree").SimpleCallExpression} CallExpression
+ * @typedef {Node & { parent?: Node }} NodeWithParent
+ */
+
+/**
+ * Gets the parent node added by ESLint during traversal.
+ *
+ * @param {Node} node - Node whose parent should be read.
+ * @returns {Node | undefined} Parent node when ESLint has attached it.
+ */
+function getParent(node) {
+  return /** @type {NodeWithParent} */ (node).parent;
+}
+
+/**
  * Check whether the given node is returned from a function that belongs to a Promise chain.
  *
  * @param {import("eslint").Rule.RuleContext} context - The rule context.
- * @param {import("eslint").Rule.Node} node - The node to evaluate.
+ * @param {Node} node - The node to evaluate.
  * @returns {boolean} Whether the node is inside a Promise-related function context.
  */
 function isInPromise(context, node) {
+  /** @type {Node | undefined} */
   let functionNode = context.sourceCode.getAncestors(node).findLast((node) => {
     return node.type === "ArrowFunctionExpression" || node.type === "FunctionExpression";
   });
-  while (
-    functionNode &&
-    functionNode.parent &&
-    functionNode.parent.type === "MemberExpression" &&
-    functionNode.parent.object === functionNode &&
-    functionNode.parent.property.type === "Identifier" &&
-    functionNode.parent.property.name === "bind" &&
-    functionNode.parent.parent &&
-    functionNode.parent.parent.type === "CallExpression" &&
-    functionNode.parent.parent.callee === functionNode.parent
-  ) {
-    functionNode = functionNode.parent.parent;
+
+  while (functionNode) {
+    const parent = getParent(functionNode);
+    const grandparent = parent ? getParent(parent) : undefined;
+    if (
+      parent?.type !== "MemberExpression" ||
+      parent.object !== functionNode ||
+      parent.property.type !== "Identifier" ||
+      parent.property.name !== "bind" ||
+      grandparent?.type !== "CallExpression" ||
+      grandparent.callee !== parent
+    ) {
+      break;
+    }
+
+    functionNode = grandparent;
   }
-  return functionNode && functionNode.parent && isPromise(functionNode.parent);
+
+  const parent = functionNode ? getParent(functionNode) : undefined;
+  return parent !== undefined && isPromise(parent);
 }
 
 /** @import {PromiseRuleModule} from "../types.d.ts" */
@@ -74,15 +97,18 @@ const rule = {
     /**
      * Check a call expression and report when Promise.resolve/reject wrapping is unnecessary.
      *
-     * @param {{ callee: import("eslint").Rule.Node }} callExpression - The call expression to inspect.
-     * @param {import("eslint").Rule.Node} node - The node to report if needed.
+     * @param {CallExpression} callExpression - The call expression to inspect.
+     * @param {Node} node - The node to report if needed.
      * @returns {void}
      */
-    function checkCallExpression({ callee }, node) {
+    function checkCallExpression(callExpression, node) {
+      const { callee } = callExpression;
       if (
         isInPromise(context, node) &&
         callee.type === "MemberExpression" &&
-        callee.object.name === "Promise"
+        callee.object.type === "Identifier" &&
+        callee.object.name === "Promise" &&
+        callee.property.type === "Identifier"
       ) {
         if (callee.property.name === "resolve") {
           context.report({ node, messageId: "resolve" });
