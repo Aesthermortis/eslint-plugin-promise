@@ -1,8 +1,8 @@
-import { RuleTester } from "../rule-tester.js";
+import { RuleTester } from "eslint";
 import rule from "../../src/rules/no-return-in-finally.js";
 
 const ruleTester = new RuleTester({
-  parserOptions: {
+  languageOptions: {
     ecmaVersion: 6,
   },
 });

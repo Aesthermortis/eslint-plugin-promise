@@ -1,8 +1,8 @@
 import rule from "../../src/rules/prefer-await-to-callbacks.js";
-import { RuleTester } from "../rule-tester.js";
+import { RuleTester } from "eslint";
 
 const ruleTester = new RuleTester({
-  parserOptions: {
+  languageOptions: {
     ecmaVersion: 8,
   },
 });

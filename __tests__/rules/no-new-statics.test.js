@@ -1,5 +1,5 @@
 import rule from "../../src/rules/no-new-statics.js";
-import { RuleTester } from "../rule-tester.js";
+import { RuleTester } from "eslint";
 
 const ruleTester = new RuleTester();
 
