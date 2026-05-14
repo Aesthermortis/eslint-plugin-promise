@@ -25,8 +25,15 @@
  */
 function hasPromiseCallback(node) {
   // istanbul ignore if -- only being called within `CallExpression`
-  if (node.type !== "CallExpression") return false;
-  if (node.callee.type !== "MemberExpression") return false;
+  if (node.type !== "CallExpression") {
+    return false;
+  }
+  if (node.callee.type !== "MemberExpression") {
+    return false;
+  }
+  if (node.callee.property.type !== "Identifier") {
+    return false;
+  }
   const propertyName = node.callee.property.name;
   return propertyName === "then" || propertyName === "catch";
 }
