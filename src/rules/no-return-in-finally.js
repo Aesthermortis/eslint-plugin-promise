@@ -20,24 +20,29 @@ const rule = {
   create(context) {
     return {
       CallExpression(node) {
+        if (!isPromise(node) || node.callee.type !== "MemberExpression") {
+          return;
+        }
+        if (node.callee.property.type !== "Identifier" || node.callee.property.name !== "finally") {
+          return;
+        }
+
+        const callback = node.arguments[0];
         if (
-          isPromise(node) &&
-          node.callee &&
-          node.callee.property &&
-          node.callee.property.name === "finally" &&
-          node.arguments &&
-          node.arguments[0] &&
-          node.arguments[0].body &&
-          node.arguments[0].body.body &&
-          node.arguments[0].body.body.some((statement) => {
+          !callback ||
+          (callback.type !== "FunctionExpression" && callback.type !== "ArrowFunctionExpression") ||
+          callback.body.type !== "BlockStatement" ||
+          !callback.body.body.some((statement) => {
             return statement.type === "ReturnStatement";
           })
         ) {
-          context.report({
-            node: node.callee.property,
-            messageId: "avoidReturnInFinally",
-          });
+          return;
         }
+
+        context.report({
+          node: node.callee.property,
+          messageId: "avoidReturnInFinally",
+        });
       },
     };
   },
