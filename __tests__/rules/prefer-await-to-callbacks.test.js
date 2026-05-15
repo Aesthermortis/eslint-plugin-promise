@@ -87,5 +87,13 @@ ruleTester.run("prefer-await-to-callbacks", rule, {
       code: `customMap(errors, (err) => err.message)`,
       errors: [{ message }],
     },
+    {
+      code: `errors["map"](err => err.message)`,
+      errors: [{ message }],
+    },
+    {
+      code: `(getHandler())(err => err.message)`,
+      errors: [{ message }],
+    },
   ],
 });
