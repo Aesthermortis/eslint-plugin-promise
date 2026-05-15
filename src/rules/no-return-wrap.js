@@ -38,6 +38,7 @@ function isInPromise(context, node) {
 
   while (functionNode) {
     const parent = getParent(functionNode);
+    /* c8 ignore next -- ESLint traversal attaches parents to ancestor functions. */
     const grandparent = parent ? getParent(parent) : undefined;
     if (
       parent?.type !== "MemberExpression" ||
