@@ -2,7 +2,7 @@
 
 Enforce best practices for JavaScript promises.
 
-[![CI](https://github.com/Aesthermortis/eslint-plugin-promise/actions/workflows/ci.yml/badge.svg)](https://github.com/Aesthermortis/eslint-plugin-promise/actions/workflows/ci.yml)
+[![CI](https://github.com/Aesthermortis/eslint-plugin-promise/actions/workflows/validate.yml/badge.svg)](https://github.com/Aesthermortis/eslint-plugin-promise/actions/workflows/validate.yml)
 [![ESLint](https://img.shields.io/badge/lint-ESLint-4B32C3.svg)](https://eslint.org/)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
