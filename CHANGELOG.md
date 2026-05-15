@@ -1,5 +1,74 @@
 # Changelog
 
+## [9.0.0](https://github.com/Aesthermortis/eslint-plugin-promise/compare/v8.0.0...v9.0.0) (2026-05-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* **api:** named configs and rules exports are no longer available. Use the default plugin export instead.
+
+### 🌟 Features
+
+* **configs:** add all rules config ([f702886](https://github.com/Aesthermortis/eslint-plugin-promise/commit/f7028865e21b42086e0af658a7129a1f2c38d908))
+
+
+### 🩹 Fixes
+
+* **types:** cast callback ancestors ([7ca09dd](https://github.com/Aesthermortis/eslint-plugin-promise/commit/7ca09dd351237ba54254cf8891c37c1c20db4b9e))
+* **types:** guard avoid-new constructor callee ([807f460](https://github.com/Aesthermortis/eslint-plugin-promise/commit/807f4604227311aa976000f6cb8ba750d1f083a0))
+* **types:** guard callback helper nodes ([b2a1f3b](https://github.com/Aesthermortis/eslint-plugin-promise/commit/b2a1f3beb7febdcd6d1c04be67bee356c2c47dc4))
+* **types:** guard catch-or-return member checks ([715796d](https://github.com/Aesthermortis/eslint-plugin-promise/commit/715796d24fe2c4cee323a425c146291d45ec2529))
+* **types:** guard finally callback checks ([dcb8318](https://github.com/Aesthermortis/eslint-plugin-promise/commit/dcb831848fe6d754cd2b107edcd76e084fae74cd))
+* **types:** guard no-nesting report target ([860da04](https://github.com/Aesthermortis/eslint-plugin-promise/commit/860da049d32ac38fa74c9a0a1946e6b8c88c8818))
+* **types:** guard promise callback properties ([b722731](https://github.com/Aesthermortis/eslint-plugin-promise/commit/b72273181387590feb30d8816fb5bed7360a92c8))
+* **types:** guard promise member detection ([036a4be](https://github.com/Aesthermortis/eslint-plugin-promise/commit/036a4bec64eb5a5e8a465739fca15717a979d7c3))
+* **types:** guard promise parameter names ([7a40ade](https://github.com/Aesthermortis/eslint-plugin-promise/commit/7a40ade5b01f3ced5a38eea9621ce537cdf9cf8c))
+* **types:** guard promise static names ([4e78941](https://github.com/Aesthermortis/eslint-plugin-promise/commit/4e7894188887e576026a5d1158f62dcbae9a4d81))
+* **types:** guard resolver parent lookups ([ac59144](https://github.com/Aesthermortis/eslint-plugin-promise/commit/ac59144db248e5b3b3cee028f3e6ebcdee7e2a8e))
+* **types:** guard return wrap promise checks ([092b630](https://github.com/Aesthermortis/eslint-plugin-promise/commit/092b6301436d200655e8091a95d3dbe4dad0b81a))
+* **types:** guard spec-only property names ([6cff9b2](https://github.com/Aesthermortis/eslint-plugin-promise/commit/6cff9b2d382d4f12e71b7805e42cbb447caf9fe7))
+* **types:** guard valid params method names ([cdfa765](https://github.com/Aesthermortis/eslint-plugin-promise/commit/cdfa765171a5a462f0f74647a51d2d66d6235a65))
+* **types:** narrow callback function params ([672cab3](https://github.com/Aesthermortis/eslint-plugin-promise/commit/672cab35735d06407d8bbac442c68265e91e433a))
+* **types:** narrow callback-in-promise AST checks ([1343e99](https://github.com/Aesthermortis/eslint-plugin-promise/commit/1343e9963023d73a8074730f604669cd59a24326))
+* **types:** narrow promise callback parents ([4342eac](https://github.com/Aesthermortis/eslint-plugin-promise/commit/4342eacbd20eb6d142a4e9364eac9f98b29e2c89))
+* **types:** type always-return parent traversal ([1ffdd36](https://github.com/Aesthermortis/eslint-plugin-promise/commit/1ffdd3654436b02505585c6f312a67fde9533942))
+* **types:** type callback call helpers ([6c2a060](https://github.com/Aesthermortis/eslint-plugin-promise/commit/6c2a0600aeab8fcd60687718574a2c4f58d22d1d))
+* **types:** type removable fixer arguments ([1b13ae6](https://github.com/Aesthermortis/eslint-plugin-promise/commit/1b13ae61f48b6b323242f1b4ca66ef21416686d9))
+
+
+### 📚 Documentation
+
+* **readme:** clarify installation instructions ([61eaa3d](https://github.com/Aesthermortis/eslint-plugin-promise/commit/61eaa3d2e0741d9353145e2f68168a679e37a213))
+* **readme:** update CI badge to point to validate workflow ([ccc4395](https://github.com/Aesthermortis/eslint-plugin-promise/commit/ccc4395b302323a9a098679222637df6ceeeb2fd))
+* **rules:** regenerate all config markers ([30e3928](https://github.com/Aesthermortis/eslint-plugin-promise/commit/30e39286c58d8b82f7cfc2e9b5be523112599b9d))
+
+
+### 🧹 Chores
+
+* **api:** expose plugin through default export ([2e7b0c5](https://github.com/Aesthermortis/eslint-plugin-promise/commit/2e7b0c55aa3e0dad5446ad58265b7f8e6988b74b))
+* **config:** extract recommended rules config ([66057b5](https://github.com/Aesthermortis/eslint-plugin-promise/commit/66057b5077d210f3efbcfaa68a51a64029676c24))
+* **configs:** cover plugin configs and rule metadata ([e3f8456](https://github.com/Aesthermortis/eslint-plugin-promise/commit/e3f84562e47a2bcd151613fb4c917e0e8d496c5d))
+* **coverage:** cover callback callee variants ([940ee76](https://github.com/Aesthermortis/eslint-plugin-promise/commit/940ee76e4fab53e910a656265f5f09e7e2c34b9e))
+* **coverage:** cover param-names destructured params ([32664ad](https://github.com/Aesthermortis/eslint-plugin-promise/commit/32664adcb6173f3e352fe3d37cf9f80a239daa7a))
+* **coverage:** cover spec-only unknown properties ([22c97c8](https://github.com/Aesthermortis/eslint-plugin-promise/commit/22c97c8dc02b13e84b39dd237fa994b8d8272bbd))
+* **coverage:** cover valid-params chain extensions ([0fadf7f](https://github.com/Aesthermortis/eslint-plugin-promise/commit/0fadf7f14b51136f2e5ffeb9c5be8b32a8384e6b))
+* **coverage:** ignore no-return-wrap parent fallback ([2635b91](https://github.com/Aesthermortis/eslint-plugin-promise/commit/2635b91e7fe7dc58a3e45055b7fcb1d3f2422f53))
+* **coverage:** ignore unreachable always-return fallback ([16d1702](https://github.com/Aesthermortis/eslint-plugin-promise/commit/16d17020ccd4d20db932e184b20a602e84bb1b9c))
+* **coverage:** ignore unreachable resolver fallbacks ([b73b649](https://github.com/Aesthermortis/eslint-plugin-promise/commit/b73b649657b8412cc8560454a9a11d4d56ea70b9))
+* **dependabot:** simplify update config and labels ([88cfa03](https://github.com/Aesthermortis/eslint-plugin-promise/commit/88cfa03ca487f21e53f8ae20c7cc4801d4e96d73))
+* **package:** remove unused rollup-plugin-dts ([9d500d6](https://github.com/Aesthermortis/eslint-plugin-promise/commit/9d500d6c52493c7f500bb88ebace0de810a2f47e))
+* **rule-tester:** use ESLint RuleTester ([54ccd9a](https://github.com/Aesthermortis/eslint-plugin-promise/commit/54ccd9a50f9a9f90a5ddbbab00b2abe1895dd795))
+* **rules:** avoid no-nesting JSDoc alignment loop ([553b7d7](https://github.com/Aesthermortis/eslint-plugin-promise/commit/553b7d7d7162272aaec85d99d2b77d4fe6dffe1a))
+* **rules:** move rule tests under rules directory ([90a137c](https://github.com/Aesthermortis/eslint-plugin-promise/commit/90a137c4151029a6d4791174ff458b1e6ede2067))
+* **rules:** remove redundant no-nesting guard ([e2c029a](https://github.com/Aesthermortis/eslint-plugin-promise/commit/e2c029a6c9da73237b29b01476032875792e6a9f))
+
+
+### 🤖 Automation
+
+* **deps-dev:** bump the dev-dependencies group with 8 updates ([#3](https://github.com/Aesthermortis/eslint-plugin-promise/issues/3)) ([27d6e51](https://github.com/Aesthermortis/eslint-plugin-promise/commit/27d6e51ae754adb2f0a623711f2558164005a0ab))
+* **deps:** bump fast-uri from 3.1.0 to 3.1.2 ([#4](https://github.com/Aesthermortis/eslint-plugin-promise/issues/4)) ([bf84196](https://github.com/Aesthermortis/eslint-plugin-promise/commit/bf841966918507d980c74a26d525b56455107853))
+* **tooling:** configure type-aware linting ([1d58001](https://github.com/Aesthermortis/eslint-plugin-promise/commit/1d58001f8d51e841dec7154ceb8c5997d4046ef4))
+
 ## [8.0.0](https://github.com/Aesthermortis/eslint-plugin-promise/compare/v7.2.1...v8.0.0) (2026-05-01)
 
 
