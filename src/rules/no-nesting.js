@@ -7,6 +7,8 @@ import getDocsUrl from "./lib/get-docs-url.js";
 import hasPromiseCallback from "./lib/has-promise-callback.js";
 import isInsidePromise from "./lib/is-inside-promise.js";
 
+/** @typedef {import("estree").MemberExpression & { property: import("estree").Identifier }} PromiseCallee */
+
 /**
  * Iterates references owned by variables defined in a scope.
  *
@@ -66,11 +68,7 @@ const rule = {
           // The node is not in the callback function.
           return;
         }
-        const promiseCallee = /**
-                               * @type {import("estree").MemberExpression & {
-                               *   property: import("estree").Identifier;
-                               * }}
-                               */ (node.callee);
+        const promiseCallee = /** @type {PromiseCallee} */ (node.callee);
 
         // Checks if the argument callback uses variables defined in the closest callback function scope.
         //
