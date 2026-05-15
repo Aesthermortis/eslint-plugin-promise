@@ -14,11 +14,15 @@ Enforce best practices for JavaScript promises.
 
 ## Installation
 
-Install ESLint and `eslint-plugin-promise` as development dependencies:
+This fork can be installed with `npm` directly from GitHub as one of your
+project's `devDependencies`:
 
 ```sh
 npm i -D eslint github:Aesthermortis/eslint-plugin-promise
 ```
+
+> [!NOTE]
+> This fork targets `Node.js 24+`, `npm 11+`, and `ESLint 10`.
 
 ## Usage
 
