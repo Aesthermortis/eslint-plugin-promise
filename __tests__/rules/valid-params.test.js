@@ -60,6 +60,10 @@ ruleTester.run("valid-params", rule, {
     "promiseReference.finally(callback)",
     "promiseReference.finally(() => {})",
 
+    // valid unvalidated Promise chain extensions
+    "Promise.resolve().foo()",
+    'Promise.resolve()["foo"]()',
+
     {
       code: `
         somePromise.then(function() {
